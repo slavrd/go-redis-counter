@@ -14,7 +14,7 @@ type RedisCounter struct {
 	rclient *redis.Client
 }
 
-// Get returns the current value counter
+// Get returns the current value of the counter
 func (rc *RedisCounter) Get() (int, error) {
 
 	result, err := rc.rclient.Get(rc.rkey).Result()
@@ -42,7 +42,7 @@ func (rc *RedisCounter) IncrBy(a int64) (int64, error) {
 	return rv, nil
 }
 
-// NewCounter returns creates a RedisCounter with the provided connection details.
+// NewCounter creates a RedisCounter with the provided connection details.
 //
 // "raddr" format should be host:port
 //
