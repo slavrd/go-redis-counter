@@ -43,8 +43,10 @@ func (rc *RedisCounter) IncrBy(a int64) (int64, error) {
 }
 
 // NewCounter returns creates a RedisCounter with the provided connection details.
-// raddr is host:port address.
-// rpass can be set to "" if no password authentication is required.
+//
+// "raddr" format should be host:port
+//
+// "rpass" can be set to "" if no password authentication is required.
 func NewCounter(raddr, rpass, rkey string, rdb int) (*RedisCounter, error) {
 
 	// create the redis client and check it can connect
