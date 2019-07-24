@@ -1,5 +1,5 @@
 // Command console starts a console client that implements the rediscounter package.
-// It will increment the counter value and display the result.package main
+// It will increment the counter value and display the result
 package main
 
 import (
