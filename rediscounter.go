@@ -20,12 +20,7 @@ func (rc *RedisCounter) Get() (int, error) {
 	result, err := rc.rclient.Get(rc.rkey).Result()
 
 	// set rkey to 0 if it does not exist in redis
-	if err == redis.Nil {
-		_, serr := rc.rclient.Set(rc.rkey, 0, 0).Result()
-		if serr != nil {
-			return 0, fmt.Errorf("error initializing redis key: %v", serr)
-		}
-	} else if err != nil {
+	if err != nil {
 		return 0, fmt.Errorf("error reading form reids: %v", err)
 	}
 
@@ -49,6 +44,7 @@ func (rc *RedisCounter) IncrBy(a int64) (int64, error) {
 
 // NewCounter returns creates a RedisCounter with the provided connection details.
 // raddr is host:port address.
+// rpass can be set to "" if no password authentication is required.
 func NewCounter(raddr, rpass, rkey string, rdb int) (*RedisCounter, error) {
 
 	// create the redis client and check it can connect
