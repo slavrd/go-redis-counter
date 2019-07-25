@@ -1,0 +1,2 @@
+.vagrant/
+ops/config/redis.conf
