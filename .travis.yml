@@ -14,7 +14,7 @@ env:
 
 before_script:
   - ruby -e 'require "erb"; redis_pass=ENV["REDIS_PASS"]; File.write("ops/config/redis.conf",ERB.new(File.read("ops/config/redis.conf.erb")).result(binding))'
-  - sudo cp ops/config/redis.conf /etc/redis/redis.conf && sudo systemctl reload redis-server.service
+  - sudo cp ops/config/redis.conf /etc/redis/redis.conf && sudo systemctl restart redis-server.service
   - mkdir -p artefacts; pushd console; go build -o ../artefacts/console; popd
 
 script:
