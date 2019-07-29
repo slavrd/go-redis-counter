@@ -1,0 +1,22 @@
+dist: xenial
+sudo: required
+language: go
+go: "1.12.x"
+
+services:
+  - redis
+
+env:
+  global:
+    - REDIS_ADDR=localhost:6379 # must include the port as well
+    # REDIS_PASS
+    - secure: "TfN8Dn3HcQAbgUfvwNyJ5VWN0asMqwvjMjksqpiC0JxtZHRRcl5aTHeA97Nwau8f+ea1xw8gHV5/4f/2iH8wytlzPxTIAEL6u47KWpAW1pF5uFJHJuIZT5ZLr7TEJuo+odbv4FVHNWozYvMdx/56mDl8RtOV99W5dFJxK+PbF6PIfeaj5qlVJSanWdFSYk7JhgXviom/Wn4lEXLTytYrBp96btlq4cEytQMONpz04tsUVjqFcEV+QtQw4zS7ZvNZjRICKU5ZRVLq2Ijo/8MueYqO/SpfKdn2D3tgFGzOggjF45TgI8qviUlBJpkw51xVEcGzv98yJAezrp0L5zuFJp1jfV8yR8C0ugXLXu6UqiLcqFpb99SFIWOOse6qNkxaahU0Zl2IxhruS1if2cqYZk0h9j3tTM0JXMpamFSqm4ZHZ28804m2rjHzuAIf2KvbWIEAELRsAgVpEA6tpNRNxeSURetrybXjcG7NWhh00d0dQtpm/vuk1CPhY8bifvm74OiFddAx5totgauN0x9EedfvprjbhipvHwcjiD3j2DPU+IqBxCGjQaIi9q264fD+HqhUC8ja5lvhoocrSzhvUs9PYYP18EGY7GCIlafXbA+nt1uBFZjhNr6ndHgRCa8rVOtonXQ3WeCJtr5plQHZ70URYjVR8mJuRpAC5zU4gpU="
+
+before_script:
+  - ruby -e 'require "erb"; redis_pass=ENV["REDIS_PASS"]; File.write("ops/config/redis.conf",ERB.new(File.read("ops/config/redis.conf.erb")).result(binding))'
+  - sudo cp ops/config/redis.conf /etc/redis/redis.conf && sudo systemctl reload redis-server.service
+  - mkdir -p artefacts; pushd console; go build -o ../artefacts/console; popd
+
+script:
+  - go test -v
+  - tests/test_rc_console.sh artefacts/console "$REDIS_ADDR" "$REDIS_PASS"
