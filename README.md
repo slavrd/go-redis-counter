@@ -1,5 +1,7 @@
 # Go redis counter package
 
+[![Build Status](https://travis-ci.com/slavrd/go-redis-counter.svg?branch=master)](https://travis-ci.com/slavrd/go-redis-counter)
+
 Package `rediscounter` provides a simple counter that stores its value in a redis server.
 
 The package documentation is available as [godoc](https://godoc.org/github.com/slavrd/go-redis-counter)
