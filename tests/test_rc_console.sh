@@ -7,13 +7,17 @@ if [ "$#" != 3 ]; then
     echo "usage test_rc_console.sh <console_app_path> <reids_addr> <redis_pass>"
 fi
 
-VAL1="$($1 -a $2 -pass $3)" || {
-    echo "failed running $1"
+APP="$1"
+IFS=':' RADDR=($2)
+RPASS="$3"
+
+VAL1="$($APP -a ${RADDR[0]} -pass $RPASS)" || {
+    echo "failed running $APP"
     exit 1
 }
 
-VAL2="$($1 -a $2 -pass $3)" || {
-    echo "failed running $1"
+VAL2="$($APP -a ${RADDR[0]} -pass $RPASS)" || {
+    echo "failed running $APP"
     exit 1
 }
 
