@@ -15,7 +15,7 @@ type RedisCounter struct {
 }
 
 // Get returns the current value of the counter
-func (rc *RedisCounter) Get() (int, error) {
+func (rc *RedisCounter) Get() (int64, error) {
 
 	result, err := rc.rclient.Get(rc.rkey).Result()
 
@@ -25,7 +25,7 @@ func (rc *RedisCounter) Get() (int, error) {
 	}
 
 	// confirm that the value is int and return it
-	cv, err := strconv.Atoi(result)
+	cv, err := strconv.ParseInt(result, 10, 64)
 	if err != nil {
 		return 0, fmt.Errorf("redis key: %q value: %q is not int: %v",
 			rc.rkey, result, err)

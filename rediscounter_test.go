@@ -81,7 +81,7 @@ func TestGet(t *testing.T) {
 	}
 
 	// set the expected value in redis
-	tests := []int{0, 1, 7, math.MaxInt32}
+	tests := []int64{0, 1, 7, math.MaxInt64}
 	for _, tv := range tests {
 
 		// set test value in redis
