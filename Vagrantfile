@@ -25,7 +25,7 @@ Vagrant.configure("2") do |config|
         c.vm.box = "slavrd/xenial64"
         c.vm.network "private_network", ip: "192.168.2.21"
 
-        c.vm.provision "shell", privileged: false, path: "ops/scripts/provision.sh"
+        c.vm.provision "shell", privileged: false, path: "ops/scripts/provision_client.sh"
 
         c.vm.provision "shell", inline: "echo export REDIS_ADDR='#{redis_addr}' | sudo tee -a /home/vagrant/.profile"
         c.vm.provision "shell", inline: "echo export REDIS_PASS=\\''#{redis_pass}'\\' | sudo tee -a /home/vagrant/.profile"
