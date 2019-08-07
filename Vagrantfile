@@ -7,8 +7,6 @@ Vagrant.configure("2") do |config|
 
     vault_addr = "192.168.2.12"
     vault_token="devV@ultRootT0ken"
-    vault_secret_path = "kv/redispassword"
-    vault_secret_key = "pass"
 
     config.vm.define 'redis' do |r|
 
