@@ -81,9 +81,10 @@ func newVaultClient() (*api.Client, error) {
 	vconf := api.DefaultConfig()
 
 	va := os.Getenv("VAULT_ADDR")
-	if va != "" {
-		vconf.Address = va
+	if va == "" {
+		return nil, fmt.Errorf("error initializing vault api client: environment variable 'VAULT_ADDR' is not set")
 	}
+	vconf.Address = va
 
 	vaultClient, err := api.NewClient(vconf)
 	if err != nil {
