@@ -1,0 +1,2 @@
+# exclude ops/config/ from github language detection
+ops/config/* linguist-detectable=false
