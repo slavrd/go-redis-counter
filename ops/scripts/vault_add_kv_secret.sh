@@ -15,4 +15,4 @@ if [ "${#}" != "3" ]; then
     exit 1
 fi
 
-vault kv put "${1}" "${2}"="${3}"
+vault kv put "${1}" "${2}"="${3}" 1>/dev/null
