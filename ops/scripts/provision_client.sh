@@ -2,7 +2,7 @@
 # provisions the VM with the needed packages
 
 # list of packages to install, separated by space
-PKGS="git vim"
+PKGS="git vim curl jq"
 
 # version of Golang to install
 GOVER="1.12"

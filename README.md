@@ -29,10 +29,19 @@ vagrant up # build the VMs
 vagrant ssh client # login to the client VM
 
 # commands below are executed on the client VM
-go get github.com/slavrd/go-redis-counter # download the counter app source code
-go build $(go env GOPATH)/src/github.com/slavrd/go-redis-counter/console # build the console counter app
-./console -a $REDIS_ADDR -pass $REDIS_PASS # run the app passing the redis password directly
-./console -a $REDIS_ADDR -v-use # run the app retrieving the redis password from Vault
+
+# download the counter app source code and all dependencies
+go get github.com/slavrd/go-redis-counter/...
+
+# build the console counter app
+go build $(go env GOPATH)/src/github.com/slavrd/go-redis-counter/console
+
+# run the app passing the redis password directly
+./console -a $REDIS_ADDR -pass $REDIS_PASS
+
+# run the app retrieving the redis password from Vault
+./console -a $REDIS_ADDR -v-use
+
 exit # exit from the client VM to the host
 
 vagrant destroy # destroy the vagrant VMs
