@@ -23,6 +23,18 @@ Vagrant.configure("2") do |config|
 
     end
 
+    config.vm.define 'vault' do |vault|
+
+        vault.vm.box = "slavrd/xenial64"
+        vault.vm.network "private_network", ip: vault_addr
+        vault.vm.network "forwarded_port", guest: 8200, host: 8200
+
+        vault.vm.provision "shell", privileged: false, path: "ops/scripts/provision_vault.sh"
+        vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_setup_basic.sh", args: [vault_token]
+        vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_add_kv_secret.sh", args: "kv/redispassword pass \'#{redis_pass}\'"
+
+    end
+
     config.vm.define 'client' do |c|
 
         c.vm.box = "slavrd/xenial64"
@@ -34,19 +46,7 @@ Vagrant.configure("2") do |config|
         c.vm.provision "shell", inline: "echo export REDIS_ADDR='#{redis_addr}' | sudo tee -a /home/vagrant/.profile"
         c.vm.provision "shell", inline: "echo export REDIS_PASS=\\''#{redis_pass}'\\' | sudo tee -a /home/vagrant/.profile"
         c.vm.provision "shell", inline: "echo export VAULT_ADDR='http://#{vault_addr }:8200' | sudo tee -a /home/vagrant/.profile"
-        c.vm.provision "shell", inline: "echo export VAULT_TOKEN='#{vault_token}' | sudo tee -a /home/vagrant/.profile"
-
-    end
-
-    config.vm.define 'vault' do |vault|
-
-        vault.vm.box = "slavrd/xenial64"
-        vault.vm.network "private_network", ip: vault_addr
-        vault.vm.network "forwarded_port", guest: 8200, host: 8200
-
-        vault.vm.provision "shell", privileged: false, path: "ops/scripts/provision_vault.sh"
-        vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_setup_basic.sh", args: [vault_token]
-        vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_add_kv_secret.sh", args: "kv/redispassword pass \'#{redis_pass}\'"
+        c.vm.provision "shell", privileged: false, path: "ops/scripts/vault_create_token.sh", args: ["http://#{vault_addr }:8200", "#{vault_token}"]
 
     end
 
