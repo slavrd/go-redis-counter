@@ -35,20 +35,17 @@ Vagrant.configure("2") do |config|
         vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_add_kv_secret.sh", args: "kv/redispassword pass \'#{redis_pass}\'"
         vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_setup_policy.sh", args: ["#{vault_policy_name}", "/vagrant/ops/config/vault-access-policy.hcl"]
 
-
     end
 
     config.vm.define 'client' do |c|
 
         c.vm.box = "slavrd/xenial64"
         c.vm.network "private_network", ip: "192.168.2.21"
+        c.vm.synced_folder ".", "/home/vagarant/go/src/github.com/slavrd/go-redis-counter"
 
         c.vm.provision "shell", privileged: false, path: "ops/scripts/provision_client.sh"
-
         # set up environment variables for convinience
-        c.vm.provision "shell", inline: "echo export REDIS_ADDR='#{redis_addr}' | sudo tee -a /home/vagrant/.profile"
-        c.vm.provision "shell", inline: "echo export REDIS_PASS=\\''#{redis_pass}'\\' | sudo tee -a /home/vagrant/.profile"
-        c.vm.provision "shell", inline: "echo export VAULT_ADDR='http://#{vault_addr }:8200' | sudo tee -a /home/vagrant/.profile"
+        c.vm.provision "shell", privileged: false, path: "ops/scripts/provision_client_env.sh", args: "#{redis_addr} '#{redis_pass}' http://#{vault_addr}:8200"
         c.vm.provision "shell", privileged: false, path: "ops/scripts/vault_create_token.sh", args: ["http://#{vault_addr }:8200", "#{vault_token}","#{vault_policy_name}"]
 
     end
