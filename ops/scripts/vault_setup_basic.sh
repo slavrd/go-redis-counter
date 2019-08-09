@@ -39,3 +39,6 @@ vault secrets disable secret/ 1>/dev/null
 
 # enable a v1 kv secrets engine
 vault secrets enable -version=1 kv 1>/dev/null
+
+# create Vault policy for rediscounter
+vault policy write rediscounter /vagrant/ops/config/vault-access-policy.hcl 1>/dev/null
