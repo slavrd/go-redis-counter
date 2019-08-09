@@ -20,7 +20,7 @@ The `redis` VM will have redis server running on port `6379` which will be mappe
 
 The `vault` VM will have Vault installed and running in `dev` mode on port `8200` which will be mapped to the host as well.
 
-The `client` VM will have Golang installed so the application can be built and run. The redis server IP and password will be set in the environment variables `$REDIS_ADDR` and `$REDIS_PASS`. The Vault server address and root token will be set as well in `$VAULT_ADDR` and `$VAULT_TOKEN` respectively.
+The `client` VM will have Golang installed so the application can be built and run. The redis server IP and password will be set in the environment variables `$REDIS_ADDR` and `$REDIS_PASS`. The Vault server address and access token will be set as well in `$VAULT_ADDR` and `$VAULT_TOKEN` respectively.
 
 Example:
 
