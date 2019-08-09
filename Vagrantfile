@@ -7,6 +7,7 @@ Vagrant.configure("2") do |config|
 
     vault_addr = "192.168.2.12"
     vault_token="devV@ultRootT0ken"
+    vault_policy_name="rediscounter" # name for vault policy which restrics access to redis password secret only 
 
     config.vm.define 'redis' do |r|
 
@@ -32,6 +33,8 @@ Vagrant.configure("2") do |config|
         vault.vm.provision "shell", privileged: false, path: "ops/scripts/provision_vault.sh"
         vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_setup_basic.sh", args: [vault_token]
         vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_add_kv_secret.sh", args: "kv/redispassword pass \'#{redis_pass}\'"
+        vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_setup_policy.sh", args: ["#{vault_policy_name}", "/vagrant/ops/config/vault-access-policy.hcl"]
+
 
     end
 
@@ -46,7 +49,7 @@ Vagrant.configure("2") do |config|
         c.vm.provision "shell", inline: "echo export REDIS_ADDR='#{redis_addr}' | sudo tee -a /home/vagrant/.profile"
         c.vm.provision "shell", inline: "echo export REDIS_PASS=\\''#{redis_pass}'\\' | sudo tee -a /home/vagrant/.profile"
         c.vm.provision "shell", inline: "echo export VAULT_ADDR='http://#{vault_addr }:8200' | sudo tee -a /home/vagrant/.profile"
-        c.vm.provision "shell", privileged: false, path: "ops/scripts/vault_create_token.sh", args: ["http://#{vault_addr }:8200", "#{vault_token}"]
+        c.vm.provision "shell", privileged: false, path: "ops/scripts/vault_create_token.sh", args: ["http://#{vault_addr }:8200", "#{vault_token}","#{vault_policy_name}"]
 
     end
 

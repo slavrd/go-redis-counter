@@ -13,5 +13,5 @@ which $PKGS || {
 }
 
 # install Vault
-curl -sSf -o /tmp/tf_install.sh https://raw.githubusercontent.com/slavrd/bash-various-scripts/master/install_hc_product.sh \
-    && bash /tmp/tf_install.sh vault $VAULT_VERSION linux amd64
+curl -sSf -o /tmp/hc_install.sh https://raw.githubusercontent.com/slavrd/bash-various-scripts/master/install_hc_product.sh \
+    && bash /tmp/hc_install.sh vault $VAULT_VERSION linux amd64
