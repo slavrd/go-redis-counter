@@ -48,7 +48,7 @@
         </main>
         <footer>
             <div class="ft-element" id="ft-redisinfo">{{ .RedisConnInfo}}</div>
-            <div class="ft-element" id="ft-time">{{ .Time}}</div>
+            <div class="ft-element" id="ft-time">{{ .Time.Format "2006-01-02 15:04:05 MST"}}</div>
         </footer>
     </body>
 </html>
