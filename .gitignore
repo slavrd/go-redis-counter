@@ -1,2 +1,3 @@
 .vagrant/
+.vscode/
 ops/config/redis.conf
