@@ -12,7 +12,15 @@ func handleGet(w http.ResponseWriter, r *http.Request) {
 
 	htmlCounterCtx.Time = time.Now()
 
-	err := htmlCounterTpl.Execute(w, htmlCounterCtx)
+	var err error
+	htmlCounterCtx.CtrValue, err = htmlCounterCtx.counter.Get()
+	if err != nil {
+		log.Printf("error getting counter value: %v", err)
+		w.WriteHeader(500)
+		w.Write([]byte("Internal Server Error!"))
+	}
+
+	err = htmlCounterTpl.Execute(w, htmlCounterCtx)
 	if err != nil {
 		log.Printf("error writing response: %v", err)
 	}
