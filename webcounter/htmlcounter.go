@@ -46,7 +46,7 @@ func newHTMLCounter(rAddr, rPass, rKey string, rDB int) (*htmlCounter, error) {
 		counter:       rc,
 		CtrValue:      rcValue,
 		Time:          time.Now(),
-		RedisConnInfo: fmt.Sprintf("redis @ %s db=%v key=%q", rAddr, rDB, rKey),
+		RedisConnInfo: fmt.Sprintf("redis @ %s; db: %v; key: %q", rAddr, rDB, rKey),
 	}
 
 	return htmlRC, nil
