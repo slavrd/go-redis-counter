@@ -46,8 +46,8 @@ func main() {
 	}
 
 	// setup server handlers
-	http.Handle("/incr/", http.HandlerFunc(handleIncr))
-	http.Handle("/get/", http.HandlerFunc(handleGet))
+	http.Handle("/incr", http.HandlerFunc(handleIncr))
+	http.Handle("/get", http.HandlerFunc(handleGet))
 
 	// start server
 	log.Fatal(http.ListenAndServe(*bindAddr, nil))
