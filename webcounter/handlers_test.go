@@ -49,7 +49,7 @@ func TestHandlers(t *testing.T) {
 			t.Errorf("handler testcase:\n%v\nincreased the counter value. Initial value: %v current value: %v", test, initCtrValue, htmlCounterCtx.CtrValue)
 		}
 
-		if htmlCounterCtx.Time.Sub(initTime) >= 0 {
+		if htmlCounterCtx.Time.Sub(initTime) <= 0 {
 			t.Errorf("handler testcase:\n%v\nnot update Time correctly. Initial value: %v current value: %v", test, initTime, htmlCounterCtx.Time)
 		}
 
