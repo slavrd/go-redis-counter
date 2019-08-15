@@ -42,15 +42,15 @@ func TestHandlers(t *testing.T) {
 		test.handler(w, r)
 
 		if w.Code != test.wantCode {
-			t.Errorf("handler testcase:\n%v\nwrong status code, want: %v, got: %v", test, test.wantCode, w.Code)
+			t.Errorf("handler testcase: %v\nwrong status code, want: %v, got: %v", test, test.wantCode, w.Code)
 		}
 
 		if initCtrValue+test.ctrDif != htmlCounterCtx.CtrValue {
-			t.Errorf("handler testcase:\n%v\nincreased the counter value. Initial value: %v current value: %v", test, initCtrValue, htmlCounterCtx.CtrValue)
+			t.Errorf("handler testcase: %v\nincreased the counter value. Initial value: %v current value: %v", test, initCtrValue, htmlCounterCtx.CtrValue)
 		}
 
-		if htmlCounterCtx.Time.Sub(initTime) >= 0 {
-			t.Errorf("handler testcase:\n%v\nnot update Time correctly. Initial value: %v current value: %v", test, initTime, htmlCounterCtx.Time)
+		if htmlCounterCtx.Time.Sub(initTime) <= 0 {
+			t.Errorf("handler testcase: %v\nnot update Time correctly. Initial value: %v current value: %v", test, initTime, htmlCounterCtx.Time)
 		}
 
 		// check the response body
@@ -62,7 +62,7 @@ func TestHandlers(t *testing.T) {
 		tpl.Execute(buf, htmlCounterCtx)
 
 		if !bytes.Equal(buf.Bytes(), w.Body.Bytes()) {
-			t.Errorf("handleGet: wrong body \nwant:\n\n%s\n\ngot:\n\n%s\n", buf.String(), w.Body.String())
+			t.Errorf("handler testcase: %v\n wrong body \nwant:\n\n%s\n\ngot:\n\n%s\n", test, buf.String(), w.Body.String())
 		}
 	}
 }
