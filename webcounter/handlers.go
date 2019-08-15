@@ -18,6 +18,7 @@ func handleGet(w http.ResponseWriter, r *http.Request) {
 		log.Printf("error getting counter value: %v", err)
 		w.WriteHeader(500)
 		w.Write([]byte("Internal Server Error!"))
+		return
 	}
 
 	err = htmlCounterTpl.Execute(w, htmlCounterCtx)
@@ -35,6 +36,7 @@ func handleIncr(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(500)
 		w.Write([]byte("Internal Server Error"))
 		log.Printf("error generating response: %v", err)
+		return
 	}
 
 	err = htmlCounterTpl.Execute(w, htmlCounterCtx)
