@@ -12,15 +12,15 @@ import (
 )
 
 // redis addres to use for the tests
-var raddr = "127.0.0.1:6379"
+var raddr string
 
 // redis password to use for tests
-var rpass = os.Getenv("REDIS_PASS")
+var rpass string
 
 // redis key to use for the tests
-var rkey = "count"
+var rkey string
 
-// redis db to use for the tests
+// redis db to use for the tests. This cannot be overridden by setting the CLI flag.
 var rdb = 10
 
 // a redis.Client to use for setting up redis test values
@@ -40,10 +40,19 @@ func init() {
 	} else {
 		raddr = *redisHost
 	}
-
 	if !strings.ContainsRune(raddr, ':') {
 		raddr = strings.Join([]string{raddr, strconv.Itoa(*redisPort)}, ":")
 	}
+
+	// set redis password to environment variable if present
+	envRPass := os.Getenv("REDIS_PASS")
+	if envRPass != "" {
+		rpass = envRPass
+	} else {
+		rpass = *redisPass
+	}
+
+	rkey = *redisKey
 
 	// create a redis.Client to interract with redis
 	c = redis.NewClient(&redis.Options{
