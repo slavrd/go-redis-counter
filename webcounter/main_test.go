@@ -3,12 +3,14 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/go-redis/redis"
+	rediscounter "github.com/slavrd/go-redis-counter"
 )
 
 // redis addres to use for the tests
@@ -76,10 +78,10 @@ func init() {
 		}
 	}
 
-	// set up tmlCounterCtx
-	htmlCounterCtx, err = newHTMLCounter(raddr, rpass, rkey, rdb)
+	// initialize the global RedisCounter
+	counter, err = rediscounter.NewCounter(fmt.Sprintf("%s:%v", *redisHost, *redisPort), *redisPass, *redisKey, *redisDB)
 	if err != nil {
-		log.Fatalf("error createting htmlCounter instance for htmlCounterCtx: %v", err)
+		log.Fatalf("error initializing RedisCounter: %v", err)
 	}
 
 	// set up htmlCounterTpl

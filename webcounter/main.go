@@ -10,6 +10,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	rediscounter "github.com/slavrd/go-redis-counter"
 )
 
 // command line flags
@@ -27,8 +29,10 @@ var vSecretPath = flag.String("vault-secret-path", "kv/redispassword", "vault pa
 var vSecretKey = flag.String("vault-secret-key", "pass", "vault secret key for redis password")
 
 // global variables
-var htmlCounterCtx *htmlCounter
+var redisConnInfo string // string to display on the web page
 var htmlCounterTpl *template.Template
+
+var counter *rediscounter.RedisCounter
 
 func main() {
 	flag.Parse()
@@ -40,14 +44,18 @@ func main() {
 		log.Fatalf("error loading html template: %v", err)
 	}
 
-	htmlCounterCtx, err = newHTMLCounter(fmt.Sprintf("%s:%v", *redisHost, *redisPort), *redisPass, *redisKey, *redisDB)
+	// generate redis connection info string to display on the webpage
+	redisConnInfo = fmt.Sprintf("redis @ %s:%v, db: %v, key: %q", *redisHost, *redisPort, *redisDB, *redisKey)
+
+	// initialize the server's RedisCounter instance
+	counter, err = rediscounter.NewCounter(fmt.Sprintf("%s:%v", *redisHost, *redisPort), *redisPass, *redisKey, *redisDB)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// setup server handlers
-	http.Handle("/incr", http.HandlerFunc(handleIncr))
-	http.Handle("/get", http.HandlerFunc(handleGet))
+	http.Handle("/incr", newHandler(newIncrCtx, htmlCounterTpl))
+	http.Handle("/get", newHandler(newGetCtx, htmlCounterTpl))
 
 	// start server
 	log.Fatal(http.ListenAndServe(*bindAddr, nil))
@@ -67,4 +75,27 @@ func loadTemplate(tplPath string) (*template.Template, error) {
 	}
 
 	return tpl, nil
+}
+
+// newHandler returns a http.Handler func which renders the tpl template
+// with a counterCtx incstace created using cf func
+func newHandler(ctxf func(*rediscounter.RedisCounter) (*counterCtx, error), tpl *template.Template) http.Handler {
+
+	h := func(w http.ResponseWriter, r *http.Request) {
+
+		ctx, err := ctxf(counter)
+		if err != nil {
+			log.Printf("error generating counter ctx: %v", err)
+			w.WriteHeader(500)
+			w.Write([]byte("Internal server error!"))
+			return
+		}
+
+		err = tpl.Execute(w, ctx)
+		if err != nil {
+			log.Printf("error writing response: %v", err)
+		}
+	}
+
+	return http.HandlerFunc(h)
 }
