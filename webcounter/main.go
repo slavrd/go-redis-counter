@@ -10,6 +10,9 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"strconv"
+	"strings"
 
 	rediscounter "github.com/slavrd/go-redis-counter"
 )
@@ -29,28 +32,60 @@ var vSecretPath = flag.String("vault-secret-path", "kv/redispassword", "vault pa
 var vSecretKey = flag.String("vault-secret-key", "pass", "vault secret key for redis password")
 
 // global variables
+var redisAddr string     // host:port address for the redis server
 var redisConnInfo string // string to display on the web page
-var htmlCounterTpl *template.Template
-
 var counter *rediscounter.RedisCounter
+var htmlCounterTpl *template.Template // html template to render for responses
 
-func main() {
+func init() {
 	flag.Parse()
 
-	// set up global variables
+	// check which flags have been set
+	sf := make(map[string]struct{})
+	flag.Visit(func(f *flag.Flag) { sf[f.Name] = struct{}{} })
+
+	// handle environment variable configuration
+	// Priority is: passed flag > env var > default flag
+
+	// for redisAddr we need to join redis-host and redis-port
+	// or if using REDIS_ADDR check if it contains port
+	if _, ok := sf["redis-host"]; !ok {
+		if os.Getenv("REDIS_ADDR") != "" {
+			redisAddr = os.Getenv("REDIS_ADDR")
+		} else {
+			redisAddr = *redisHost
+		}
+	} else {
+		redisAddr = *redisHost
+	}
+	if !strings.ContainsRune(redisAddr, ':') {
+		redisAddr = strings.Join([]string{redisAddr, strconv.Itoa(*redisPort)}, ":")
+	}
+
+	// set up redis-pass
+	if _, ok := sf["redis-pass"]; !ok && os.Getenv("REDIS_PASS") != "" {
+		*redisPass = os.Getenv("REDIS_PASS")
+	}
+
+	// set global variables
+
 	var err error
 	htmlCounterTpl, err = loadTemplate(*tplPath)
 	if err != nil {
 		log.Fatalf("error loading html template: %v", err)
 	}
 
-	// generate redis connection info string to display on the webpage
-	redisConnInfo = fmt.Sprintf("redis @ %s:%v, db: %v, key: %q", *redisHost, *redisPort, *redisDB, *redisKey)
+	redisConnInfo = fmt.Sprintf("redis @ %s, db: %v, key: %q", redisAddr, *redisDB, *redisKey)
+}
 
-	// initialize the server's RedisCounter instance
-	counter, err = rediscounter.NewCounter(fmt.Sprintf("%s:%v", *redisHost, *redisPort), *redisPass, *redisKey, *redisDB)
+func main() {
+
+	// initialize the server's RedisCounter instance.
+	// not done in init() as we need slightly different process for testing initialization
+	var err error
+	counter, err = rediscounter.NewCounter(redisAddr, *redisPass, *redisKey, *redisDB)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("error intializing global RedisCounter: %v", err)
 	}
 
 	// setup server handlers

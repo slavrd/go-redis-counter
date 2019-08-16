@@ -3,64 +3,22 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
-	"os"
-	"strconv"
-	"strings"
 
 	"github.com/go-redis/redis"
 	rediscounter "github.com/slavrd/go-redis-counter"
 )
-
-// redis addres to use for the tests
-var raddr string
-
-// redis password to use for tests
-var rpass string
-
-// redis key to use for the tests
-var rkey string
-
-// redis db to use for the tests. This cannot be overridden by setting the CLI flag.
-var rdb = 10
-
-// a redis.Client to use for setting up redis test values
-var c *redis.Client
 
 // commnad line flags
 var clearRKey = flag.Bool("d", false, "clear redis key if already present")
 
 func init() {
 
-	flag.Parse()
-
-	// normalize redis address
-	envRAddr := os.Getenv("REDIS_ADDR")
-	if envRAddr != "" {
-		raddr = envRAddr
-	} else {
-		raddr = *redisHost
-	}
-	if !strings.ContainsRune(raddr, ':') {
-		raddr = strings.Join([]string{raddr, strconv.Itoa(*redisPort)}, ":")
-	}
-
-	// set redis password to environment variable if present
-	envRPass := os.Getenv("REDIS_PASS")
-	if envRPass != "" {
-		rpass = envRPass
-	} else {
-		rpass = *redisPass
-	}
-
-	rkey = *redisKey
-
 	// create a redis.Client to interract with redis
-	c = redis.NewClient(&redis.Options{
-		Addr:     raddr,
-		DB:       rdb,
-		Password: rpass,
+	c := redis.NewClient(&redis.Options{
+		Addr:     redisAddr,
+		DB:       *redisDB,
+		Password: *redisPass,
 	})
 
 	// confirm the client is working
@@ -70,24 +28,17 @@ func init() {
 	}
 
 	// check if key is already present
-	_, err = c.Get(rkey).Result()
+	_, err = c.Get(*redisKey).Result()
 	if err != redis.Nil {
-		log.Printf("WARN: key %q already exist in redis db %v", rkey, rdb)
+		log.Printf("WARN: key %q already exist in redis db %v", *redisKey, *redisDB)
 		if !*clearRKey {
-			log.Fatal("aborting tests: can pass -d flag to allow existing key modification")
+			log.Fatal("aborting tests: can pass:\n  -d flag to allow modifications\n  -redis-db N to use a different database")
 		}
 	}
 
-	// initialize the global RedisCounter
-	counter, err = rediscounter.NewCounter(fmt.Sprintf("%s:%v", *redisHost, *redisPort), *redisPass, *redisKey, *redisDB)
+	// initialize global redis counter
+	counter, err = rediscounter.NewCounter(redisAddr, *redisPass, *redisKey, *redisDB)
 	if err != nil {
-		log.Fatalf("error initializing RedisCounter: %v", err)
+		log.Fatalf("error intializing global RedisCounter: %v", err)
 	}
-
-	// set up htmlCounterTpl
-	htmlCounterTpl, err = loadTemplate(*tplPath)
-	if err != nil {
-		log.Fatalf("error loading html template: %v", err)
-	}
-
 }
