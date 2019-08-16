@@ -24,5 +24,7 @@ before_script:
   - mkdir -p artefacts; pushd console; go build -o ../artefacts/console; popd
 
 script:
-  - go test -v ./...
+  - go test -v -d
+  - go test -v ./console/
+  - go test -v ./webcounter/ -d
   - tests/test_rc_console.sh artefacts/console "$REDIS_ADDR" "$REDIS_PASS"
