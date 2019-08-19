@@ -33,3 +33,16 @@ script:
   - go test -v ./webcounter/ -d
   - tests/test_rc_console.sh artifacts/console "$REDIS_ADDR" "$REDIS_PASS"
   - tests/test_rc_webcounter.sh
+
+before_deploy:
+- pushd artifacts/; zip -r9 webcounter.zip webcounter/; popd
+
+deploy:
+  provider: releases
+  on:
+    repo: slavrd/go-redis-counter
+    tags: true
+  file: artifacts/webcounter.zip
+  skip_cleanup: true
+  api_key:
+    secure: "Re1edu9ADJurpKH77Bbr7AFxazE8CN3VoTaH7KEWSwCHlEmVTV0v0hvS1r/W0B8l6XvHolTCTV8cXjmWMJ6nIqSqNWEN9Swbb800Zs+1Ah1t/yTe1KM1KZZBzWeX5Ol1PMoxI9ECAP4chDH8C5QdrpULc7sLzRkKkC6gjeelKrcYK1qjH9wMXzgGUYAG9/Jrea+GjAogaco5teGEK4AqRqE2FRAdGeBAvIYQRJWF+GPb0Ty1d5HY4ZdW2SUAvvmm+x9DnOQrCRWBhJQ1vyiq9jxEJRS6iJBFSQsccNJopkTQ7WGCNyvbmssqcKPyCTiar3hnx/qYfBl0fUSRnVCb+UHu/0rerOYnCOapyJ37jBIWr08ql8RgLRc7MttDAOUgsxv4/MaNrRaNAGo8Y3Oc25mpDHi6zySggAJMMd2S42Qv1jag+GDQV3pI+TNhjWCMy2I6dwls6sYloVBf6RAzWQkyZkqTpacyK5NhNGN67tY1H0Y8fi1FYBQjYXQBLEGyalDLrc8dc7z/G+WXZkX6fiBu/kxOofcIbwTKvc14AuxKjDEdef4Zd+OY/De33bA9isN3/Tk0QyKZ0s0VQprkG6kOYoNM+q7M5s2zZVR9V+P/P+VAsr/EmHCsVVw88sHWhoKO5qz/aKHd7B/UoqClCFGH1ffGySTM3wcgpyP+wMk="
