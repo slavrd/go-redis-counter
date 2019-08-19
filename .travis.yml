@@ -24,7 +24,7 @@ before_script:
   - mkdir -p artifacts
   - pushd console; go build -o ../artifacts/console; popd
   - pushd webcounter; go build -o ../artifacts/webcounter/webcounter; cp -r html/ ../artifacts/webcounter/html; popd
-  - artifacts/webcounter/webcounter & sleep 1
+  - pushd artifacts/webcounter/; ./webcounter & sleep 1; popd
 
 
 script:
