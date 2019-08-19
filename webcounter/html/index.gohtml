@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <title>rediscounter</title>
+        <style>
+            body {
+                background-color: gainsboro;
+                text-align: center;
+            }
+            h1 {
+                font-size: 24pt;
+            }
+            #countervalue {
+                font-size: 28pt;
+            }
+            header {
+                border-bottom: 1pt solid;
+            }
+            footer {
+                margin-top: 20px;
+                border-top: 1pt solid;
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+            }
+            .ft-element {
+                width: 50%;
+                margin-top: 20px;
+                font-size: 11pt;
+            }
+            #ft-redisinfo {
+                text-align: right;
+                margin-right: 5%;
+            }
+            #ft-time {
+                text-align: left;
+                margin-left: 5%;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Rediscounter</h1>
+        </header>
+        <main>
+            <h1>Count</h1>
+            <div id="countervalue">{{ .CtrValue}}</div>
+        </main>
+        <footer>
+            <div class="ft-element" id="ft-redisinfo">{{ .RedisConnInfo}}</div>
+            <div class="ft-element" id="ft-time">{{ .Time.Format "2006-01-02 15:04:05 MST"}}</div>
+        </footer>
+    </body>
+</html>
