@@ -6,7 +6,10 @@ Package `rediscounter` provides a simple counter that stores its value in a redi
 
 The package documentation is available as [godoc](https://godoc.org/github.com/slavrd/go-redis-counter)
 
-The project includes a console application in folder `console/` which implements the `rediscounter` package. Detailed description is in its [readme](console/README.md)
+The project includes basic implementations of the package:
+
+* a console application in folder `console/` - [readme](console/README.md).
+* a web application in folder `webcounter/`- [readme](webcounter/README.md).
 
 ## Vagrant environment
 
