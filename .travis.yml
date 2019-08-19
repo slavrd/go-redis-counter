@@ -21,10 +21,15 @@ before_script:
   - ops/scripts/provision_vault.sh
   - ops/scripts/vault_setup_basic.sh $VAULT_TOKEN
   - ops/scripts/vault_add_kv_secret.sh kv/redispassword pass $REDIS_PASS
-  - mkdir -p artefacts; pushd console; go build -o ../artefacts/console; popd
+  - mkdir -p artifacts
+  - pushd console; go build -o ../artifacts/console; popd
+  - pushd webcounter; go build -o ../artifacts/webcounter/webcounter; cp -r html/ ../artifacts/webcounter/html; popd
+  - artifacts/webcounter/webcounter & sleep 1
+
 
 script:
   - go test -v -d
   - go test -v ./console/
   - go test -v ./webcounter/ -d
-  - tests/test_rc_console.sh artefacts/console "$REDIS_ADDR" "$REDIS_PASS"
+  - tests/test_rc_console.sh artifacts/console "$REDIS_ADDR" "$REDIS_PASS"
+  - tests/test_rc_webcounter.sh
