@@ -74,3 +74,47 @@ func TestNewHandler(t *testing.T) {
 		}
 	}
 }
+
+// TestNewHealthHandler uses a mock function to test the http.handlers returned by newHealthHandler
+func TestNewHealthHandler(t *testing.T) {
+
+	type testcaseNewHealth struct {
+		name     string
+		wantCode int
+		wantBody []byte
+		hcf      func() error
+	}
+
+	tests := []testcaseNewHealth{
+		{
+			name:     "no error",
+			wantCode: 200,
+			wantBody: []byte("OK"),
+			hcf:      func() error { return nil },
+		},
+		{
+			name:     "error",
+			wantCode: 500,
+			wantBody: []byte("Redis server is down!"),
+			hcf:      func() error { return fmt.Errorf("this is not an error") },
+		},
+	}
+
+	for _, test := range tests {
+		h := newHealthHandler(test.hcf)
+
+		r := httptest.NewRequest("GET", "/health", nil)
+		w := httptest.NewRecorder()
+
+		h.ServeHTTP(w, r)
+
+		if w.Code != test.wantCode {
+			t.Errorf("testcase: %q returned wrong status code want: %v got: %v", test.name, test.wantCode, w.Code)
+		}
+
+		if !bytes.Equal(w.Body.Bytes(), test.wantBody) {
+			t.Errorf("testcase: %q returned wrong body\nwant: %q\ngot: %q", test.name, test.wantBody, w.Body.Bytes())
+		}
+	}
+
+}

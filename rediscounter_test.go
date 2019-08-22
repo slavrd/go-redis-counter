@@ -83,7 +83,7 @@ func TestNewCounter(t *testing.T) {
 
 	rc, err := NewCounter(raddr, rpass, rkey, rdb)
 	if err != nil {
-		t.Fatalf("error createting rediscounter.RedisCounter: %v", err)
+		t.Fatalf("error creating rediscounter.RedisCounter: %v", err)
 	}
 
 	if rc.rkey != rkey {
@@ -108,7 +108,7 @@ func TestGet(t *testing.T) {
 	// crete a rediscounter.RedisClient
 	rc, err := NewCounter(raddr, rpass, rkey, rdb)
 	if err != nil {
-		t.Errorf("error createting rediscounter.RedisCounter: %v", err)
+		t.Errorf("error creating rediscounter.RedisCounter: %v", err)
 	}
 
 	// set the expected value in redis
@@ -143,7 +143,7 @@ func TestIncrBy(t *testing.T) {
 	// crete a rediscounter.RedisClient
 	rc, err := NewCounter(raddr, rpass, rkey, rdb)
 	if err != nil {
-		t.Errorf("error createting rediscounter.RedisCounter: %v", err)
+		t.Errorf("error creating rediscounter.RedisCounter: %v", err)
 	}
 
 	for i := int64(0); i < 10; i++ {
@@ -176,5 +176,29 @@ func TestIncrBy(t *testing.T) {
 			t.Errorf("IncrBy(%v) did not return actual redis value want: %v got: %v", i, aIncr, r)
 		}
 
+	}
+}
+
+// TestRedisHealth tests RedisCounter.RedisHealth() method
+func TestRedisHealth(t *testing.T) {
+	rc, err := NewCounter(raddr, rpass, rkey, rdb)
+	if err != nil {
+		t.Errorf("error creating rediscounter.RedisCounter: %v", err)
+	}
+
+	// check result for working redis
+	r := rc.RedisHealth()
+	if r != nil {
+		t.Errorf("returned non-nil error with working redis connection got: %v want: %v", r, nil)
+	}
+
+	// modify the underlying redis client so the rediscounter cannot connect
+	opt := rc.rclient.Options()
+	opt.Addr = "wronghost:1111"
+	rc.rclient = redis.NewClient(opt)
+
+	r = rc.RedisHealth()
+	if r == nil {
+		t.Errorf("did not return error with non-working redis connection, got: %v, want: %v", nil, r)
 	}
 }

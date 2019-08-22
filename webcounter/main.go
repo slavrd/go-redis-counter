@@ -91,6 +91,7 @@ func main() {
 	// setup server handlers
 	http.Handle("/incr", newHandler(newIncrCtx, htmlCounterTpl))
 	http.Handle("/get", newHandler(newGetCtx, htmlCounterTpl))
+	http.Handle("/health", newHealthHandler(counter.RedisHealth))
 
 	// start server
 	log.Fatal(http.ListenAndServe(*bindAddr, nil))
@@ -129,6 +130,23 @@ func newHandler(ctxf func(*rediscounter.RedisCounter) (*counterCtx, error), tpl 
 		err = tpl.Execute(w, ctx)
 		if err != nil {
 			log.Printf("error writing response: %v", err)
+		}
+	}
+
+	return http.HandlerFunc(h)
+}
+
+func newHealthHandler(hcf func() error) http.Handler {
+
+	h := func(w http.ResponseWriter, r *http.Request) {
+		err := hcf()
+		if err == nil {
+			w.WriteHeader(200)
+			w.Write([]byte("OK"))
+		} else {
+			w.WriteHeader(500)
+			log.Printf("error healthcheck: %v", err)
+			w.Write([]byte("Redis server is down!"))
 		}
 	}
 
