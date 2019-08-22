@@ -42,6 +42,12 @@ func (rc *RedisCounter) IncrBy(a int64) (int64, error) {
 	return rv, nil
 }
 
+// RedisHealth checks the redis server connection using PING
+func (rc *RedisCounter) RedisHealth() error {
+	_, err := rc.rclient.Ping().Result()
+	return err
+}
+
 // NewCounter creates a RedisCounter with the provided connection details.
 //
 // "raddr" format should be host:port
