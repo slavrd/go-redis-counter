@@ -39,12 +39,11 @@ Vagrant.configure("2") do |config|
 
     config.vm.define 'client' do |c|
 
-        c.vm.box = "slavrd/xenial64"
+        c.vm.box = "slavrd/xenial64-golang"
         c.vm.network "private_network", ip: "192.168.2.21"
         c.vm.synced_folder ".", "/home/vagrant/go/src/github.com/slavrd/go-redis-counter"
 
-        c.vm.provision "shell", inline: "chown -R vagrant:vagrant /home/vagrant/go"    
-        c.vm.provision "shell", privileged: false, path: "ops/scripts/provision_client.sh"
+        c.vm.provision "shell", inline: "chown -R vagrant:vagrant /home/vagrant/go"
         # set up environment variables for convinience
         c.vm.provision "shell", privileged: false, path: "ops/scripts/provision_client_env.sh", args: "#{redis_addr} '#{redis_pass}' http://#{vault_addr}:8200"
         c.vm.provision "shell", privileged: false, path: "ops/scripts/vault_create_token.sh", args: ["http://#{vault_addr }:8200", "#{vault_token}","#{vault_policy_name}"]
