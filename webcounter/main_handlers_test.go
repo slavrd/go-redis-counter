@@ -3,6 +3,9 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"html/template"
+	"io/ioutil"
+	"log"
 	"net/http/httptest"
 	"reflect"
 	"testing"
@@ -117,4 +120,56 @@ func TestNewHealthHandler(t *testing.T) {
 		}
 	}
 
+}
+
+// TestNewMetricsHandler will test the returned handler
+// It will not use the global htmlMetricsTpl as it needs to change the template's timenow func to return a fixed value
+func TestNewMetricsHandler(t *testing.T) {
+
+	// create the metrics instance to test against
+	// NOTE: calling the handler should change the Data
+	tm := newMetrics(redisConnInfo)
+	tm.Data["get"] = 5
+	tm.Data["incr"] = 7
+
+	// load the template file
+	content, err := ioutil.ReadFile(*mtplPath)
+	if err != nil {
+		t.Fatalf("error reading template file: %v", err)
+	}
+
+	// create the html template with "timenow" func set to return static value
+	tt := time.Now()
+	tpl, err := template.New("metrics").
+		Funcs(template.FuncMap{"timenow": func() time.Time { return tt }}).
+		Parse(string(content))
+	if err != nil {
+		log.Fatalf("error loading metrics html template: %v", err)
+	}
+
+	// create the handler, invoke it, record the request
+	h := newMetricsHandler(tm, tpl)
+	rp := "/metrics"
+	mv := tm.Data[rp]
+	r := httptest.NewRequest("GET", rp, nil)
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, r)
+
+	// confirm that the handler increased the value for the request path
+	if tm.Data[rp] != mv+1 {
+		t.Errorf("invoking the handler did not record the call in the metrics data\n, wanted: %v got: %v", mv+1, tm.Data[rp])
+	}
+
+	// define the expected request body
+	// should be done after calling the handler so that it will reflect the data change
+	buf := bytes.NewBuffer(make([]byte, 0))
+	tpl.Execute(buf, tm) // ignorring potential error
+
+	if w.Code != 200 {
+		t.Errorf("wrong status code, wanted: 200 got: %v", w.Code)
+	}
+
+	if !bytes.Equal(buf.Bytes(), w.Body.Bytes()) {
+		t.Errorf("wrong body \nwant:\n\n%s\n\ngot:\n\n%s\n", string(buf.Bytes()), w.Body.String())
+	}
 }

@@ -39,6 +39,6 @@ func init() {
 	// initialize global redis counter
 	counter, err = rediscounter.NewCounter(redisAddr, *redisPass, *redisKey, *redisDB)
 	if err != nil {
-		log.Fatalf("error intializing global RedisCounter: %v", err)
+		log.Fatalf("error loading metrics html template: %v", err)
 	}
 }
