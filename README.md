@@ -49,3 +49,18 @@ exit # exit from the client VM to the host
 
 vagrant destroy # destroy the vagrant VMs
 ```
+## TODO
+
+- [x] Console implementation
+- [x] `console`: add integration with Vult KV secrets engine. Application should be able to retrieve redis password from Vault.
+- [x] Web implementation
+- [x] Make Vagrant mount the project in the `$GOPATH` of the client VM.
+- [x] Make Vagrant use a "golang" box instead of provisioning the client VM each time.
+- [x] Make go tests warn and stop if redis key is already set. Make it possible to force running the tests with a command flag.
+- [x] `webcounter`: Create a `/health` check method that tests the redis server connection.
+- [x] `webcounter`: Create a `/metrics` method which will report how many times each path has been requested.
+- [ ] `webcounter`: Create a `/crash` method which will stop the webserver
+- [ ] `webcounter`: Create a `/reset` method which will reset the counter
+- [ ] `webcounter`: Create a `/decr` method which will decrease the counter by 1. Should be guarded from going below `0`
+- [ ] `webcounter`: add integration with Vult KV secrets engine.
+- [ ] `webcounter`: redo UI to call the methods with buttons.

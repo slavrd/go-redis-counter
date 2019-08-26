@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <title>rediscounter</title>
+        <style>
+            body {
+                background-color: gainsboro;
+                text-align: center;
+            }
+            h1 {
+                font-size: 18pt;
+            }
+            header {
+                margin-bottom: 20px;
+                border-bottom: 1pt solid;
+            }
+            main {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+            #h1-usage-data {
+                font-size: 14pt;
+                margin-bottom: 20px;
+            }
+            table {
+                table-layout: fixed;
+                width: 300px;
+            }
+            th, td {
+                text-align: left;
+                font-size: 14pt;
+            }
+            footer {
+                margin-top: 20px;
+                border-top: 1pt solid;
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+            }
+            .ft-element {
+                width: 50%;
+                margin-top: 20px;
+                font-size: 11pt;
+            }
+            #ft-redisinfo {
+                text-align: right;
+                margin-right: 5%;
+            }
+            #ft-time {
+                text-align: left;
+                margin-left: 5%;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Metrics</h1>
+        </header>
+        <main>
+            <div id="h1-usage-data"><b>Usage Data Since:</b> {{.StartTime.Format "2006-01-02 15:04:05 MST"}}</div>
+            <table>
+                <tr class="tr-th">
+                  <th>Path</th>
+                  <th>Count</th>
+                </tr>
+                {{range $p, $c := .Data}}
+                <tr><td>{{$p}}</td><td>{{$c}}</td></tr>
+                {{end}}
+            </table>
+        </main>
+        <footer>
+            <div class="ft-element" id="ft-redisinfo">{{ .RedisConnInfo}}</div>
+            <div class="ft-element" id="ft-time">{{ timenow.Format "2006-01-02 15:04:05 MST"}}</div>
+        </footer>
+    </body>
+</html>
