@@ -1,4 +1,4 @@
-// Contains the test setup
+// Contains the tests setup
 package main
 
 import (
