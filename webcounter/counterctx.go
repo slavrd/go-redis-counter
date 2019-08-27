@@ -35,3 +35,7 @@ func newGetCtx(c *rediscounter.RedisCounter) (*counterCtx, error) {
 func newIncrCtx(c *rediscounter.RedisCounter) (*counterCtx, error) {
 	return newCounterCtx(func() (int64, error) { return c.IncrBy(1) })
 }
+
+func newResetCtx(c *rediscounter.RedisCounter) (*counterCtx, error) {
+	return newCounterCtx(c.Reset)
+}
