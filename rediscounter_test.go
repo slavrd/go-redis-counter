@@ -179,6 +179,43 @@ func TestIncrBy(t *testing.T) {
 	}
 }
 
+// TestRedisHealth tests RedisCounter.Reset() method
+func TestReset(t *testing.T) {
+
+	// set the redis key to a non 0 value
+	_, err := c.Set(rkey, 5, 0).Result()
+	if err != nil {
+		t.Fatalf("error setting redis test value: %v", err)
+	}
+
+	// crete a rediscounter.RedisClient
+	rc, err := NewCounter(raddr, rpass, rkey, rdb)
+	if err != nil {
+		t.Fatalf("error creating rediscounter.RedisCounter: %v", err)
+	}
+
+	_, err = rc.Reset()
+	if err != nil {
+		t.Fatalf("function returned an error: %v", err)
+	}
+
+	// get the the new value of the key, after Reset() was called
+	ks, err := c.Get(rkey).Result()
+	if err != nil {
+		t.Fatalf("error new key value from redis: %v", err)
+	}
+
+	k, err := strconv.ParseInt(ks, 10, 64)
+	if err != nil {
+		t.Fatalf("new key value could not be converted to int64: %v", err)
+	}
+
+	if k != 0 {
+		t.Fatalf("new key value is not 0, got: %v", k)
+	}
+
+}
+
 // TestRedisHealth tests RedisCounter.RedisHealth() method
 func TestRedisHealth(t *testing.T) {
 	rc, err := NewCounter(raddr, rpass, rkey, rdb)
