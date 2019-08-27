@@ -13,6 +13,7 @@ Requests need to be made to the following paths:
 * `/health` will return HTTP 200 and display OK or HTTP 500 and display "Redis server is down!" depending on weather the redis server connection status.
 * `/metrics` will display usage data for the called paths since the server start.
 * `/crash` will shut down the web server.
+* `/reset` will reset the counter to `0`
 
 ## Building the command
 
