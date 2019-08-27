@@ -58,10 +58,10 @@ vagrant destroy # destroy the vagrant VMs
 - [x] Make Vagrant mount the project in the `$GOPATH` of the client VM.
 - [x] Make Vagrant use a "golang" box instead of provisioning the client VM each time.
 - [x] Make go tests warn and stop if redis key is already set. Make it possible to force running the tests with a command flag.
-- [x] `webcounter`: Create a `/health` check method that tests the redis server connection.
-- [x] `webcounter`: Create a `/metrics` method which will report how many times each path has been requested.
-- [ ] `webcounter`: Create a `/crash` method which will stop the webserver
-- [ ] `webcounter`: Create a `/reset` method which will reset the counter
-- [ ] `webcounter`: Create a `/decr` method which will decrease the counter by 1. Should be guarded from going below `0`
+- [x] `webcounter`: add a `/health` check method that tests the redis server connection.
+- [x] `webcounter`: add a `/metrics` method which will report how many times each path has been requested.
+- [x] `webcounter`: add a `/crash` method which will stop the webserver
+- [ ] `webcounter`: add a `/reset` method which will reset the counter
+- [ ] `webcounter`: add a `/decr` method which will decrease the counter by `1`. Should be guarded from going below `0`
 - [ ] `webcounter`: add integration with Vult KV secrets engine.
 - [ ] `webcounter`: redo UI to call the methods with buttons.

@@ -8,10 +8,10 @@ A web application that implements the rediscounter package. When run it will sta
 
 Requests need to be made to the following paths:
 
-* `http://host:port/incr` will increment the counter and then display the resulting value.
-* `http://host:port/get` will display the current value, without incrementing it.
-* `http://host:port/health` will return HTTP 200 and display OK or HTTP 500 and display "Redis server is down!" depending on weather the redis server connection status.
-* `http://host:port/metrics` will display usage data for the called paths since the server start.
+* `/incr` will increment the counter and then display the resulting value.
+* `/get` will display the current value, without incrementing it.
+* `/health` will return HTTP 200 and display OK or HTTP 500 and display "Redis server is down!" depending on weather the redis server connection status.
+* `/metrics` will display usage data for the called paths since the server start.
 
 ## Building the command
 
