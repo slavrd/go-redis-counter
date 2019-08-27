@@ -173,3 +173,30 @@ func TestNewMetricsHandler(t *testing.T) {
 		t.Errorf("wrong body \nwant:\n\n%s\n\ngot:\n\n%s\n", string(buf.Bytes()), w.Body.String())
 	}
 }
+
+// TestNewCrashHandler will test the handler returned by newCrashHandler
+// by checking if the argument function is called correctly.
+func TestNewCrashHandler(t *testing.T) {
+
+	var res interface{}
+	f := func(a ...interface{}) {
+		res = a[0]
+	}
+
+	want := "test message"
+	h := newCrashHandler(f, want)
+	r := httptest.NewRequest("GET", "/crash", nil)
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, r)
+
+	got, ok := res.(string)
+
+	if !ok {
+		t.Fatalf("result variable is wrong type, got: %v want: string", reflect.TypeOf(res))
+	}
+
+	if got != want {
+		t.Errorf("result variable holds wrong value, got: %q want: %q", got, want)
+	}
+
+}
