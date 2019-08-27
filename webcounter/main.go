@@ -101,6 +101,7 @@ func main() {
 	// setup server handlers
 	http.Handle("/incr", newHandler(newIncrCtx, htmlCounterTpl))
 	http.Handle("/get", newHandler(newGetCtx, htmlCounterTpl))
+	http.Handle("/reset", newHandler(newResetCtx, htmlCounterTpl))
 	http.Handle("/health", newHealthHandler(counter.RedisHealth))
 	http.Handle("/metrics", newMetricsHandler(usageData, htmlMetricsTpl))
 	http.Handle("/crash", newCrashHandler(log.Fatal, "/crash called, stopping server!"))

@@ -42,6 +42,16 @@ func (rc *RedisCounter) IncrBy(a int64) (int64, error) {
 	return rv, nil
 }
 
+// Reset sets the counter value to 0.
+// It will allways return 0 so use error to determine if successful.
+func (rc *RedisCounter) Reset() (int64, error) {
+	_, err := rc.rclient.Set(rc.rkey, 0, 0).Result()
+	if err != nil {
+		return 0, err
+	}
+	return 0, nil
+}
+
 // RedisHealth checks the redis server connection using PING
 func (rc *RedisCounter) RedisHealth() error {
 	_, err := rc.rclient.Ping().Result()
