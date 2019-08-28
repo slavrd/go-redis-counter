@@ -4,6 +4,7 @@ package rediscounter
 import (
 	"fmt"
 	"strconv"
+	"sync"
 
 	"github.com/go-redis/redis"
 )
@@ -12,6 +13,7 @@ import (
 type RedisCounter struct {
 	rkey    string
 	rclient *redis.Client
+	mutex   *sync.Mutex
 }
 
 // Get returns the current value of the counter
@@ -19,7 +21,6 @@ func (rc *RedisCounter) Get() (int64, error) {
 
 	result, err := rc.rclient.Get(rc.rkey).Result()
 
-	// set rkey to 0 if it does not exist in redis
 	if err != nil {
 		return 0, fmt.Errorf("error reading form reids: %v", err)
 	}
@@ -35,6 +36,8 @@ func (rc *RedisCounter) Get() (int64, error) {
 
 // IncrBy increases the counter's value by "a" amount and reports the resulting value
 func (rc *RedisCounter) IncrBy(a int64) (int64, error) {
+	rc.mutex.Lock()
+	defer rc.mutex.Unlock()
 	rv, err := rc.rclient.IncrBy(rc.rkey, a).Result()
 	if err != nil {
 		return 0, fmt.Errorf("error incrementing value: %v", err)
@@ -45,6 +48,8 @@ func (rc *RedisCounter) IncrBy(a int64) (int64, error) {
 // Reset sets the counter value to 0.
 // It will allways return 0 so use error to determine if successful.
 func (rc *RedisCounter) Reset() (int64, error) {
+	rc.mutex.Lock()
+	defer rc.mutex.Unlock()
 	_, err := rc.rclient.Set(rc.rkey, 0, 0).Result()
 	if err != nil {
 		return 0, err
@@ -81,5 +86,5 @@ func NewCounter(raddr, rpass, rkey string, rdb int) (*RedisCounter, error) {
 		return nil, fmt.Errorf("failed connecting to redis: %v", err)
 	}
 
-	return &RedisCounter{rclient: rclient, rkey: rkey}, nil
+	return &RedisCounter{rclient: rclient, rkey: rkey, mutex: &sync.Mutex{}}, nil
 }
