@@ -28,12 +28,17 @@ func newCounterCtx(cf func() (int64, error)) (*counterCtx, error) {
 	return r, nil
 }
 
+// Below are wrappers for the newCounterCtx that call it with specific RedisCounter methods
 func newGetCtx(c *rediscounter.RedisCounter) (*counterCtx, error) {
 	return newCounterCtx(c.Get)
 }
 
 func newIncrCtx(c *rediscounter.RedisCounter) (*counterCtx, error) {
 	return newCounterCtx(func() (int64, error) { return c.IncrBy(1) })
+}
+
+func newDecrCtx(c *rediscounter.RedisCounter) (*counterCtx, error) {
+	return newCounterCtx(func() (int64, error) { return c.DecrBy(1) })
 }
 
 func newResetCtx(c *rediscounter.RedisCounter) (*counterCtx, error) {
