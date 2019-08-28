@@ -22,7 +22,7 @@ func (rc *RedisCounter) Get() (int64, error) {
 	result, err := rc.rclient.Get(rc.rkey).Result()
 
 	if err != nil {
-		return 0, fmt.Errorf("error reading form reids: %v", err)
+		return 0, fmt.Errorf("error reading form redis: %v", err)
 	}
 
 	// confirm that the value is int and return it
@@ -43,6 +43,40 @@ func (rc *RedisCounter) IncrBy(a int64) (int64, error) {
 		return 0, fmt.Errorf("error incrementing value: %v", err)
 	}
 	return rv, nil
+}
+
+// DecrBy decreases the counter's value by "a" amount and reports the resulting value.
+// The counter's value cannot go below 0.
+func (rc *RedisCounter) DecrBy(a int64) (int64, error) {
+	rc.mutex.Lock()
+	defer rc.mutex.Unlock()
+
+	v, err := rc.Get()
+	if err != nil {
+		return 0, err
+	}
+
+	// check if value is already 0 and simply return 0
+	if v == 0 {
+		return 0, nil
+	}
+
+	// check if value will go below 0 and if so set it to 0
+	if v-a < 0 {
+		_, err = rc.rclient.Set(rc.rkey, 0, 0).Result()
+		if err != nil {
+			return 0, fmt.Errorf("error decreasing counter value: %v", err)
+		}
+		return 0, nil
+	}
+
+	// decrease the counter value by a
+	r, err := rc.rclient.DecrBy(rc.rkey, a).Result()
+	if err != nil {
+		return 0, fmt.Errorf("error decreasing counter value: %v", err)
+	}
+	return r, nil
+
 }
 
 // Reset sets the counter value to 0.

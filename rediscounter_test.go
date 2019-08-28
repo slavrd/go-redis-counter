@@ -179,6 +179,71 @@ func TestIncrBy(t *testing.T) {
 	}
 }
 
+// TestDecrBy verifies that RedisCounter.DecrBy(a int64) method
+func TestDecrBy(t *testing.T) {
+
+	type testcase struct {
+		startValue  int64
+		decrByValue int64
+	}
+
+	tests := []testcase{
+		{
+			startValue:  5,
+			decrByValue: 2,
+		},
+		{
+			startValue:  2,
+			decrByValue: 2,
+		},
+		{
+			startValue:  1,
+			decrByValue: 2,
+		},
+		{
+			startValue:  0,
+			decrByValue: 2,
+		},
+	}
+
+	// crete a rediscounter.RedisClient
+	rc, err := NewCounter(raddr, rpass, rkey, rdb)
+	if err != nil {
+		t.Fatalf("error creating rediscounter.RedisCounter: %v", err)
+	}
+
+	for _, test := range tests {
+
+		_, err := c.Set(rkey, test.startValue, 0).Result()
+		if err != nil {
+			t.Errorf("for startValue: %v, decrByValue: %v, error setting redis test value: %v", test.startValue, test.decrByValue, err)
+			continue
+		}
+
+		r, err := rc.DecrBy(test.decrByValue)
+		if err != nil {
+			t.Errorf("for startValue: %v, decrByValue: %v, DecrBy returned an error: %v", test.startValue, test.decrByValue, err)
+			continue
+		}
+
+		// set want value to test.startValue - test.decrByValue if positive or to 0
+		var w int64
+		if test.startValue-test.decrByValue > 0 {
+			w = test.startValue - test.decrByValue
+		}
+
+		if r < 0 {
+			t.Errorf("for startValue: %v, decrByValue: %v, value dorpped below 0, got: %v", test.startValue, test.decrByValue, r)
+		}
+
+		if r != w {
+			t.Errorf("for startValue: %v, decrByValue: %v, wrong value, got: %v, want: %v", test.startValue, test.decrByValue, r, w)
+		}
+
+	}
+
+}
+
 // TestRedisHealth tests RedisCounter.Reset() method
 func TestReset(t *testing.T) {
 
