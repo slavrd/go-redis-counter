@@ -62,6 +62,6 @@ vagrant destroy # destroy the vagrant VMs
 - [x] `webcounter`: add a `/metrics` method which will report how many times each path has been requested.
 - [x] `webcounter`: add a `/crash` method which will stop the webserver
 - [x] `webcounter`: add a `/reset` method which will reset the counter
-- [ ] `webcounter`: add a `/decr` method which will decrease the counter by `1`. Should be guarded from going below `0`
+- [x] `webcounter`: add a `/decr` method which will decrease the counter by `1`. Should be guarded from going below `0`
 - [ ] `webcounter`: add integration with Vult KV secrets engine.
 - [ ] `webcounter`: redo UI to call the methods with buttons.
