@@ -108,7 +108,7 @@ func TestGet(t *testing.T) {
 	// crete a rediscounter.RedisClient
 	rc, err := NewCounter(raddr, rpass, rkey, rdb)
 	if err != nil {
-		t.Errorf("error creating rediscounter.RedisCounter: %v", err)
+		t.Fatalf("error creating rediscounter.RedisCounter: %v", err)
 	}
 
 	// set the expected value in redis
@@ -137,13 +137,13 @@ func TestIncrBy(t *testing.T) {
 	// set the redis key value to 0
 	_, err := c.Set(rkey, 0, 0).Result()
 	if err != nil {
-		t.Errorf("error setting redis test value: %v", err)
+		t.Fatalf("error setting redis test value: %v", err)
 	}
 
 	// crete a rediscounter.RedisClient
 	rc, err := NewCounter(raddr, rpass, rkey, rdb)
 	if err != nil {
-		t.Errorf("error creating rediscounter.RedisCounter: %v", err)
+		t.Fatalf("error creating rediscounter.RedisCounter: %v", err)
 	}
 
 	for i := int64(0); i < 10; i++ {
@@ -285,7 +285,7 @@ func TestReset(t *testing.T) {
 func TestRedisHealth(t *testing.T) {
 	rc, err := NewCounter(raddr, rpass, rkey, rdb)
 	if err != nil {
-		t.Errorf("error creating rediscounter.RedisCounter: %v", err)
+		t.Fatalf("error creating rediscounter.RedisCounter: %v", err)
 	}
 
 	// check result for working redis
