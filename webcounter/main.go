@@ -95,7 +95,7 @@ func main() {
 	var err error
 	counter, err = rediscounter.NewCounter(redisAddr, *redisPass, *redisKey, *redisDB)
 	if err != nil {
-		log.Fatalf("error intializing global RedisCounter: %v", err)
+		log.Printf("error intializing global RedisCounter: %v", err)
 	}
 
 	// setup server handlers
