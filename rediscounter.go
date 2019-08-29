@@ -21,6 +21,10 @@ func (rc *RedisCounter) Get() (int64, error) {
 
 	result, err := rc.rclient.Get(rc.rkey).Result()
 
+	if err == redis.Nil {
+		return 0, nil
+	}
+
 	if err != nil {
 		return 0, fmt.Errorf("error reading form redis: %v", err)
 	}
