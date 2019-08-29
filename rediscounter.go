@@ -21,6 +21,10 @@ func (rc *RedisCounter) Get() (int64, error) {
 
 	result, err := rc.rclient.Get(rc.rkey).Result()
 
+	if err == redis.Nil {
+		return 0, nil
+	}
+
 	if err != nil {
 		return 0, fmt.Errorf("error reading form redis: %v", err)
 	}
@@ -117,8 +121,8 @@ func NewCounter(raddr, rpass, rkey string, rdb int) (*RedisCounter, error) {
 		_, err = rclient.Set(rkey, 0, 0).Result()
 	}
 	if err != nil {
-		return nil, fmt.Errorf("failed connecting to redis: %v", err)
+		err = fmt.Errorf("failed connecting to redis: %v", err)
 	}
 
-	return &RedisCounter{rclient: rclient, rkey: rkey, mutex: &sync.Mutex{}}, nil
+	return &RedisCounter{rclient: rclient, rkey: rkey, mutex: &sync.Mutex{}}, err
 }
