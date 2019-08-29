@@ -63,5 +63,7 @@ vagrant destroy # destroy the vagrant VMs
 - [x] `webcounter`: add a `/crash` method which will stop the webserver
 - [x] `webcounter`: add a `/reset` method which will reset the counter
 - [x] `webcounter`: add a `/decr` method which will decrease the counter by `1`. Should be guarded from going below `0`
+- [ ] Box with webcounter runnig as a service
+- [ ] Update box with webcounter service running as a non privileged user
 - [ ] `webcounter`: add integration with Vult KV secrets engine.
 - [ ] `webcounter`: redo UI to call the methods with buttons.
