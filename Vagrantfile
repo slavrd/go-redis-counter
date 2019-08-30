@@ -50,4 +50,19 @@ Vagrant.configure("2") do |config|
 
     end
 
+    config.vm.define 'webserver' do |w|
+
+        w.vm.box = "slavrd/go-redis-counter"
+        w.vm.network "private_network", ip: "192.168.2.31"
+        w.vm.network "forwarded_port", guest: 8000, host: 8000
+
+        ## generate webcounter service environment config from template
+        File.write("ops/config/environment.conf", ERB.new(File.read("ops/config/environment.conf.erb")).result(binding))
+
+        ## provision webserver VM, depends on the generated config
+        w.vm.provision "file", source: "ops/config/environment.conf", destination: "/tmp/environment.conf"
+        w.vm.provision "shell", path: "ops/scripts/provision_webserver.sh"
+    
+    end
+
 end
