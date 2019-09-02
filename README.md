@@ -68,3 +68,5 @@ vagrant destroy # destroy the vagrant VMs
 - [ ] Update box with webcounter service running as a non privileged user
 - [ ] `webcounter`: add integration with Vault KV secrets engine.
 - [ ] `webcounter`: redo UI to call the methods with buttons.
+- [x] packer project that creates AWS AMI with `webcounter` app installed as a service
+- [ ] terraform project that deploys `webcounter` app and its redis server in AWS
