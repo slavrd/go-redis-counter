@@ -44,6 +44,13 @@
                 margin-top: 20px;
                 font-size: 11pt;
             }
+            #ft-div-link {
+                width: fit-content;
+            }
+            .ft-link {
+                font-size: 14pt;
+                text-decoration: none;
+            }
             #ft-redisinfo {
                 text-align: right;
                 margin-right: 5%;
@@ -72,6 +79,7 @@
         </main>
         <footer>
             <div class="ft-element" id="ft-redisinfo">{{ .RedisConnInfo}}</div>
+            <div class="ft-element" id="ft-div-link"><a class="ft-link" href="/get">counter</a></div>
             <div class="ft-element" id="ft-time">{{ timenow.Format "2006-01-02 15:04:05 MST"}}</div>
         </footer>
     </body>
