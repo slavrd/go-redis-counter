@@ -16,6 +16,29 @@
             header {
                 border-bottom: 1pt solid;
             }
+            #controls {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+            }
+            button {
+                margin-left: 5px;
+                margin-right: 5px;
+                margin-top: 20px;
+                border: 1pt solid;
+                background-color: lightgray;
+                font-size: 14pt;
+                border-radius: 6px;
+            }
+            button:hover{
+                background-color:lightblue;
+            }
+            button:active{
+                background-color:darkgray;
+            }
+            button:focus{
+                outline: 0;
+            }
             footer {
                 margin-top: 20px;
                 border-top: 1pt solid;
@@ -27,6 +50,13 @@
                 width: 50%;
                 margin-top: 20px;
                 font-size: 11pt;
+            }
+            #ft-div-link {
+                width: fit-content;
+            }
+            .ft-link {
+                font-size: 14pt;
+                text-decoration: none;
             }
             #ft-redisinfo {
                 text-align: right;
@@ -45,9 +75,21 @@
         <main>
             <h1>Count</h1>
             <div id="countervalue">{{ .CtrValue}}</div>
+            <div id="controls">
+            <form action="/decr">
+                <button type="submit" >Decrease</button>
+            </form>
+            <form action="/reset">
+                <button>Reset</button>
+            </form>
+            <form action="/incr">
+                <button>Increase</button>
+            </form>
+            </div>
         </main>
         <footer>
             <div class="ft-element" id="ft-redisinfo">{{ .RedisConnInfo}}</div>
+            <div class="ft-element" id="ft-div-link"><a class="ft-link" href="/metrics">metrics</a></div>
             <div class="ft-element" id="ft-time">{{ .Time.Format "2006-01-02 15:04:05 MST"}}</div>
         </footer>
     </body>
