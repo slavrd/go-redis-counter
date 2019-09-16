@@ -70,3 +70,10 @@ vagrant destroy # destroy the vagrant VMs
 - [x] `webcounter`: update UI to call the methods with buttons.
 - [x] packer project that creates AWS AMI with `webcounter` app installed as a service
 - [ ] terraform project that deploys `webcounter` app and its redis server in AWS
+
+## Related projects
+
+* Vagrant [counter box](https://github.com/slavrd/packer-go-redis-counter-vagrant) - a Packer project that builds a Vagrant Virtualbox box with webcounter installed as a service.
+* AWS [counter AMI](https://github.com/slavrd/packer-go-redis-counter-aws) - a Packer project that builds an AWS AMI with webcounter installed as a service.
+* AWS [redis AMI](https://github.com/slavrd/packer-aws-redis64) - a Packer project that build an AWS AMI with Redis server installed.
+* AWS [Terraform deployment](https://github.com/slavrd/terraform-go-redis-counter) - a Terraform configuration to deploy the webcounter and redis AMIs in AWS. 
