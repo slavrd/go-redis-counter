@@ -70,6 +70,10 @@ vagrant destroy # destroy the vagrant VMs
 - [x] `webcounter`: update UI to call the methods with buttons.
 - [x] packer project that creates AWS AMI with `webcounter` app installed as a service
 - [x] terraform project that deploys `webcounter` app and its redis server in AWS
+- [x] add network module to the terraform project
+- [ ] terraform create AWS subents in different AZs
+- [ ] replace publicly accessible webcounter EC2 instances with load balancer
+- [ ] terraform remove redis password from EC2 instances user data
 
 ## Related projects
 
