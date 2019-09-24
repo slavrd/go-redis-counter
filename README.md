@@ -64,6 +64,7 @@ vagrant destroy # destroy the vagrant VMs
 - [x] `webcounter`: add a `/reset` method which will reset the counter
 - [x] `webcounter`: add a `/decr` method which will decrease the counter by `1`. Should be guarded from going below `0`
 - [x] `webcounter`: start even if redis connection is unavailable.
+- [ ] `webcounter`: implement mutual exclusion lock on redis level, so multiple app instances can be used.
 - [X] Box with webcounter running as a service
 - [ ] Update box with webcounter service running as a non privileged user
 - [ ] `webcounter`: add integration with Vault KV secrets engine.
