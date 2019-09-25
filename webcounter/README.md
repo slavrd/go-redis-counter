@@ -46,3 +46,9 @@ Examples:
 `./webcounter -redis-server 192.168.10.11 -redis-pass 'mypass'` - will start the server bound on `0.0.0.0`, connecting to redis @ `192.168.10.11:6379`, authenticating with `mypass`
 
 `REDIS_ADDR="192.168.10.11:6379" ./webcounter -redis-port 1111` - will start the server bound on `0.0.0.0`, connecting to redis @ `192.168.10.11:6379` with no authentication.
+
+## Current application deployment flow
+
+![web counter screenshot](./screenshots/wc_deploy_flow.png)
+
+**Note:** related repositories containing packer, terraform etc. project code are listed in the root repository [readme](../README.md#related-projects)
