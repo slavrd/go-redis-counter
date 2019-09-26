@@ -16,8 +16,9 @@ func newHandler(ctxf func(*rediscounter.RedisCounter) (*counterCtx, error), tpl 
 	h := func(w http.ResponseWriter, r *http.Request) {
 
 		usageData.add(r.URL.Path)
-
+		ctrMu.Lock()
 		ctx, err := ctxf(counter)
+		ctrMu.Unlock()
 		if err != nil {
 			log.Printf("error generating counter ctx: %v", err)
 			w.WriteHeader(500)

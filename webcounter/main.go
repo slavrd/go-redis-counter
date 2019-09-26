@@ -13,6 +13,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	rediscounter "github.com/slavrd/go-redis-counter"
@@ -31,7 +32,10 @@ var redisKey = flag.String("redis-key", "count", "redis key to use")
 // global variables
 var redisAddr string     // host:port address for the redis server
 var redisConnInfo string // string to display on the web page
+
+var ctrMu sync.Mutex // guards the global counter
 var counter *rediscounter.RedisCounter
+
 var htmlCounterTpl *template.Template // html template to render counter
 var htmlMetricsTpl *template.Template // html template to render metrics data
 var usageData *metrics
@@ -92,7 +96,9 @@ func main() {
 	// initialize the server's RedisCounter instance.
 	// not done in init() as we need slightly different process for testing initialization
 	var err error
+	ctrMu.Lock()
 	counter, err = rediscounter.NewCounter(redisAddr, *redisPass, *redisKey, *redisDB)
+	ctrMu.Unlock()
 	if err != nil {
 		log.Printf("error intializing global RedisCounter: %v", err)
 	}
