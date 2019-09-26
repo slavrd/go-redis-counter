@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -48,7 +49,7 @@ func newHealthHandler(hcf func() error) http.Handler {
 		} else {
 			w.WriteHeader(500)
 			log.Printf("error healthcheck: %v", err)
-			w.Write([]byte("Redis server is down!"))
+			w.Write([]byte(fmt.Sprintf("Cannot connect to redis: %v", err)))
 		}
 	}
 
