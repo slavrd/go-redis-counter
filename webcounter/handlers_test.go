@@ -98,7 +98,7 @@ func TestNewHealthHandler(t *testing.T) {
 		{
 			name:     "error",
 			wantCode: 500,
-			wantBody: []byte("Redis server is down!"),
+			wantBody: []byte("Cannot connect to redis: this is not an error"),
 			hcf:      func() error { return fmt.Errorf("this is not an error") },
 		},
 	}
