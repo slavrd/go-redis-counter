@@ -28,11 +28,6 @@ var redisPass = flag.String("redis-pass", "", "redis server password")
 var redisDB = flag.Int("redis-db", 0, "redis database index to use")
 var redisKey = flag.String("redis-key", "count", "redis key to use")
 
-// TODO: vault implementation
-var useVault = flag.Bool("vault", false, "use vault server to retrieve password")
-var vSecretPath = flag.String("vault-secret-path", "kv/redispassword", "vault path for redis password kv secret")
-var vSecretKey = flag.String("vault-secret-key", "pass", "vault secret key for redis password")
-
 // global variables
 var redisAddr string     // host:port address for the redis server
 var redisConnInfo string // string to display on the web page
