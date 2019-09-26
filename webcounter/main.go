@@ -95,13 +95,7 @@ func main() {
 
 	// initialize the server's RedisCounter instance.
 	// not done in init() as we need slightly different process for testing initialization
-	var err error
-	ctrMu.Lock()
-	counter, err = rediscounter.NewCounter(redisAddr, *redisPass, *redisKey, *redisDB)
-	ctrMu.Unlock()
-	if err != nil {
-		log.Printf("error intializing global RedisCounter: %v", err)
-	}
+	setGlobalCounter()
 
 	// setup server handlers
 	http.Handle("/incr", newHandler(newIncrCtx, htmlCounterTpl))
@@ -147,4 +141,15 @@ func loadMetricsTpl(mtplPath string) (*template.Template, error) {
 	}
 
 	return tpl, nil
+}
+
+// setGlobalCounter sets the value for the counter global var
+func setGlobalCounter() {
+	var err error
+	ctrMu.Lock()
+	counter, err = rediscounter.NewCounter(redisAddr, *redisPass, *redisKey, *redisDB)
+	ctrMu.Unlock()
+	if err != nil {
+		log.Printf("error intializing global RedisCounter: %v", err)
+	}
 }
