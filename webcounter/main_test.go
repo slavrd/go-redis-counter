@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/go-redis/redis"
-	rediscounter "github.com/slavrd/go-redis-counter"
 )
 
 // commnad line flags
@@ -42,10 +41,7 @@ func TestMain(m *testing.M) {
 	}
 
 	// initialize global redis counter
-	counter, err = rediscounter.NewCounter(redisAddr, *redisPass, *redisKey, *redisDB)
-	if err != nil {
-		log.Fatalf("error loading metrics html template: %v", err)
-	}
+	setGlobalCounter()
 
 	os.Exit(m.Run())
 }
