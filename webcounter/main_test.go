@@ -4,6 +4,8 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
+	"testing"
 
 	"github.com/go-redis/redis"
 	rediscounter "github.com/slavrd/go-redis-counter"
@@ -12,7 +14,10 @@ import (
 // commnad line flags
 var clearRKey = flag.Bool("d", false, "clear redis key if already present")
 
-func init() {
+func TestMain(m *testing.M) {
+
+	// parse command line flags
+	wcInit()
 
 	// create a redis.Client to interract with redis
 	c := redis.NewClient(&redis.Options{
@@ -41,4 +46,6 @@ func init() {
 	if err != nil {
 		log.Fatalf("error loading metrics html template: %v", err)
 	}
+
+	os.Exit(m.Run())
 }

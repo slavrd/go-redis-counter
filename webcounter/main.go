@@ -41,7 +41,9 @@ var htmlCounterTpl *template.Template // html template to render counter
 var htmlMetricsTpl *template.Template // html template to render metrics data
 var usageData *metrics
 
-func init() {
+// wcInit performs initialization of the global variables based on passed command line flags
+// cannot use init() as of go1.13 packages that call flag.Parse() there will cause tests to fail.
+func wcInit() {
 	flag.Parse()
 
 	// check which flags have been set
@@ -89,6 +91,8 @@ func init() {
 }
 
 func main() {
+
+	wcInit()
 
 	// initialize the server's RedisCounter instance.
 	// not done in init() as we need slightly different process for testing initialization
