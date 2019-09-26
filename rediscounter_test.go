@@ -37,7 +37,13 @@ var clearRKey = flag.Bool("d", false, "clear redis key if already present")
 
 func init() {
 
-	flag.Parse()
+	// as of go 1.13 this needs to be called if intending to use flag.Parse() in init() func
+	// it will call flag.Parse() amongst other things
+	testing.Init()
+
+	if !flag.Parsed() {
+		flag.Parse()
+	}
 
 	// normalize redis address
 	envRAddr := os.Getenv("REDIS_ADDR")
