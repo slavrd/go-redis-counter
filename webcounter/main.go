@@ -97,6 +97,18 @@ func main() {
 	// not done in init() as we need slightly different process for testing initialization
 	setGlobalCounter()
 
+	if os.Getenv("VAULT_TOKEN") != "" {
+		spath := os.Getenv("VAULT_RP_PATH")
+		if spath == "" {
+			spath = "secret/redispassword"
+		}
+		skey := os.Getenv("VAULT_RP_KEY")
+		if skey == "" {
+			skey = "pass"
+		}
+		go setVaultRedisPass(spath, skey)
+	}
+
 	// setup server handlers
 	http.Handle("/incr", newHandler(newIncrCtx, htmlCounterTpl))
 	http.Handle("/decr", newHandler(newDecrCtx, htmlCounterTpl))
@@ -152,4 +164,31 @@ func setGlobalCounter() {
 	if err != nil {
 		log.Printf("error intializing global RedisCounter: %v", err)
 	}
+}
+
+// setVaultRedisPass sets the global counter with password retrieved from Vault.
+// In case an error is received from Vault the func will auto retry in increasing intervals.
+func setVaultRedisPass(spath, skey string) {
+	vc, err := newVaultClient()
+	if err != nil {
+		log.Printf("error creating vault client: %v", err)
+		return
+	}
+
+	var p string
+	var pause = 1 * time.Second
+	for p == "" {
+		p, err = getRedisPass(vc, spath, skey)
+		if err != nil {
+			log.Printf("error retrieveing password from Vault: %v", err)
+		}
+		time.Sleep(pause)
+		if pause < 60*time.Second {
+			pause *= 2
+		}
+	}
+
+	*redisPass = p
+	setGlobalCounter()
+	log.Printf("password successfully retrieved from Vault.")
 }
