@@ -1,2 +1,2 @@
 [Service]
-Environment="REDIS_ADDR=<%= redis_addr %>" 'REDIS_PASS=<%= redis_pass %>'
+Environment="REDIS_ADDR=<%= redis_addr %>" 'VAULT_ADDR=http://<%= vault_addr %>:8200' 'VAULT_TOKEN=VAULT_TOKEN_VALUE' 'VAULT_RP_PATH=<%= vault_rp_path %>' 'VAULT_RP_KEY=<%= vault_rp_key %>'
