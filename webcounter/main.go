@@ -97,6 +97,8 @@ func main() {
 	// not done in init() as we need slightly different process for testing initialization
 	setGlobalCounter()
 
+	// if VAULT_TOKEN is set up start a goroutine to retrieve the redis password from Vault
+	// and update the global counter.
 	if os.Getenv("VAULT_TOKEN") != "" {
 		spath := os.Getenv("VAULT_RP_PATH")
 		if spath == "" {
@@ -114,7 +116,7 @@ func main() {
 	http.Handle("/decr", newHandler(newDecrCtx, htmlCounterTpl))
 	http.Handle("/get", newHandler(newGetCtx, htmlCounterTpl))
 	http.Handle("/reset", newHandler(newResetCtx, htmlCounterTpl))
-	http.Handle("/health", newHealthHandler(counter.RedisHealth))
+	http.Handle("/health", newHealthHandler())
 	http.Handle("/metrics", newMetricsHandler(usageData, htmlMetricsTpl))
 	http.Handle("/crash", newCrashHandler(log.Fatal, "/crash called, stopping server!"))
 
