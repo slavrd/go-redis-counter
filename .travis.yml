@@ -26,7 +26,7 @@ before_script:
   - pushd webcounter; go build -o ../artifacts/webcounter/webcounter; cp -r html/ ../artifacts/webcounter/html; popd
   - pushd artifacts/webcounter; ./webcounter & sleep 10; popd
 
-# test no vault functionality 
+# Make two builds to test webcounter functionality witt/without Vault
 matrix:
   include:
     - env:
