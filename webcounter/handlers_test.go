@@ -85,26 +85,30 @@ func TestNewHealthHandler(t *testing.T) {
 		name     string
 		wantCode int
 		wantBody []byte
-		hcf      func() error
+		ctr      *rediscounter.RedisCounter
 	}
+
+	origCrt := counter
+	dummyCtr, _ := rediscounter.NewCounter("raddr.noexit", "", "nokey", 10)
 
 	tests := []testcaseNewHealth{
 		{
 			name:     "no error",
 			wantCode: 200,
-			wantBody: []byte("OK"),
-			hcf:      func() error { return nil },
+			ctr:      origCrt,
 		},
 		{
 			name:     "error",
 			wantCode: 500,
-			wantBody: []byte("Redis server is down!"),
-			hcf:      func() error { return fmt.Errorf("this is not an error") },
+			ctr:      dummyCtr,
 		},
 	}
 
 	for _, test := range tests {
-		h := newHealthHandler(test.hcf)
+
+		counter = test.ctr
+
+		h := newHealthHandler()
 
 		r := httptest.NewRequest("GET", "/health", nil)
 		w := httptest.NewRecorder()
@@ -112,13 +116,11 @@ func TestNewHealthHandler(t *testing.T) {
 		h.ServeHTTP(w, r)
 
 		if w.Code != test.wantCode {
-			t.Errorf("testcase: %q returned wrong status code want: %v got: %v", test.name, test.wantCode, w.Code)
-		}
-
-		if !bytes.Equal(w.Body.Bytes(), test.wantBody) {
-			t.Errorf("testcase: %q returned wrong body\nwant: %q\ngot: %q", test.name, test.wantBody, w.Body.Bytes())
+			t.Errorf("testcase: %q returned wrong status code want: %v got: %v with counter: %v", test.name, test.wantCode, w.Code, counter)
 		}
 	}
+
+	counter = origCrt
 
 }
 

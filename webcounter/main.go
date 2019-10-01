@@ -13,6 +13,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	rediscounter "github.com/slavrd/go-redis-counter"
@@ -28,15 +29,13 @@ var redisPass = flag.String("redis-pass", "", "redis server password")
 var redisDB = flag.Int("redis-db", 0, "redis database index to use")
 var redisKey = flag.String("redis-key", "count", "redis key to use")
 
-// TODO: vault implementation
-var useVault = flag.Bool("vault", false, "use vault server to retrieve password")
-var vSecretPath = flag.String("vault-secret-path", "kv/redispassword", "vault path for redis password kv secret")
-var vSecretKey = flag.String("vault-secret-key", "pass", "vault secret key for redis password")
-
 // global variables
 var redisAddr string     // host:port address for the redis server
 var redisConnInfo string // string to display on the web page
+
+var ctrMu sync.Mutex // guards the global counter
 var counter *rediscounter.RedisCounter
+
 var htmlCounterTpl *template.Template // html template to render counter
 var htmlMetricsTpl *template.Template // html template to render metrics data
 var usageData *metrics
@@ -96,10 +95,20 @@ func main() {
 
 	// initialize the server's RedisCounter instance.
 	// not done in init() as we need slightly different process for testing initialization
-	var err error
-	counter, err = rediscounter.NewCounter(redisAddr, *redisPass, *redisKey, *redisDB)
-	if err != nil {
-		log.Printf("error intializing global RedisCounter: %v", err)
+	setGlobalCounter()
+
+	// if VAULT_TOKEN is set up start a goroutine to retrieve the redis password from Vault
+	// and update the global counter.
+	if os.Getenv("VAULT_TOKEN") != "" {
+		spath := os.Getenv("VAULT_RP_PATH")
+		if spath == "" {
+			spath = "secret/redispassword"
+		}
+		skey := os.Getenv("VAULT_RP_KEY")
+		if skey == "" {
+			skey = "pass"
+		}
+		go setVaultRedisPass(spath, skey)
 	}
 
 	// setup server handlers
@@ -107,7 +116,7 @@ func main() {
 	http.Handle("/decr", newHandler(newDecrCtx, htmlCounterTpl))
 	http.Handle("/get", newHandler(newGetCtx, htmlCounterTpl))
 	http.Handle("/reset", newHandler(newResetCtx, htmlCounterTpl))
-	http.Handle("/health", newHealthHandler(counter.RedisHealth))
+	http.Handle("/health", newHealthHandler())
 	http.Handle("/metrics", newMetricsHandler(usageData, htmlMetricsTpl))
 	http.Handle("/crash", newCrashHandler(log.Fatal, "/crash called, stopping server!"))
 
@@ -146,4 +155,42 @@ func loadMetricsTpl(mtplPath string) (*template.Template, error) {
 	}
 
 	return tpl, nil
+}
+
+// setGlobalCounter sets the value for the counter global var
+func setGlobalCounter() {
+	var err error
+	ctrMu.Lock()
+	counter, err = rediscounter.NewCounter(redisAddr, *redisPass, *redisKey, *redisDB)
+	ctrMu.Unlock()
+	if err != nil {
+		log.Printf("error intializing global RedisCounter: %v", err)
+	}
+}
+
+// setVaultRedisPass sets the global counter with password retrieved from Vault.
+// In case an error is received from Vault the func will auto retry in increasing intervals.
+func setVaultRedisPass(spath, skey string) {
+	vc, err := newVaultClient()
+	if err != nil {
+		log.Printf("error creating vault client: %v", err)
+		return
+	}
+
+	var p string
+	var pause = 1 * time.Second
+	for p == "" {
+		p, err = getRedisPass(vc, spath, skey)
+		if err != nil {
+			log.Printf("error retrieveing password from Vault: %v", err)
+		}
+		time.Sleep(pause)
+		if pause < 60*time.Second {
+			pause *= 2
+		}
+	}
+
+	*redisPass = p
+	setGlobalCounter()
+	log.Printf("password successfully retrieved from Vault.")
 }
