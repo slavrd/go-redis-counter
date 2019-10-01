@@ -39,6 +39,17 @@ Some parameters can be set using environment variables as well. Precedence is `p
 * `REDIS_ADDR` - can set the redis server `host` or `host:port`. If it holds only the `host` the `-redis-port` flag (or its default) will be used to complete the address. If it holds `host:port` and the `-redis-port` flag is passed it will be ignored unless the `-redis-host` flag is passed as well.
 * `REDIS_PASS` - can set the redis server password.
 
+The application can also retrieve the redis password from Vault. To enable/configure this the following environment vars need to be set:
+
+* `VAULT_TOKEN` - the Vault access token. If this is set the application will attempt to retrieve the pass form Vault.
+* `VAULT_ADDR` - the Vault server address. In case the variable is note set the default is `https://127.0.0.1:8200`.
+* `VAULT_RP_PATH` - the redis password secret path in Vault. Defaults to `secret/redispassword`.
+* `VAULT_RP_KEY` - the redis password secret key in Vault. Defaults to `pass`
+
+**Note:** The application will attempt to retrieve the the password from Vault if and only if `VAULT_TOKEN` is set. In case it is unable to retrieve the password for some reason - cannot connect to vault, secret does not exits etc. it will retry on increasing intervals of up to 1 min. 
+
+In any case the webserver will be started with the redis connection configured based on the values of `REDIS_PASS`/`-redis-pass`. Once the password is retrieved from Vault the connection configuration will be overridden.
+
 Examples:
 
 `./webcounter` will start the server bound on `0.0.0.0`, connecting to redis @ `127.0.0.1:6379` with no authentication.
