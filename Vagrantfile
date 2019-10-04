@@ -28,12 +28,13 @@ Vagrant.configure("2") do |config|
 
     config.vm.define 'vault' do |vault|
 
-        vault.vm.box = "slavrd/xenial64"
+        vault.vm.box = "slavrd/vault"
         vault.vm.network "private_network", ip: vault_addr
         vault.vm.network "forwarded_port", guest: 8200, host: 8200
 
-        vault.vm.provision "shell", privileged: false, path: "ops/scripts/provision_vault.sh"
-        vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_setup_basic.sh", args: [vault_token]
+        vault.vm.provision "shell", inline: "/etc/vault.d/scripts/vault_init.sh"
+        vault.vm.provision "shell", inline: "/etc/vault.d/scripts/vault_unseal.sh", run: "always"
+        vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_setup_basic.sh"
         vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_add_kv_secret.sh", args: "#{vault_rp_path} #{vault_rp_key} \'#{redis_pass}\'"
         vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_setup_policy.sh", args: ["#{vault_policy_name}", "/vagrant/ops/config/vault-access-policy.hcl"]
 
@@ -65,7 +66,8 @@ Vagrant.configure("2") do |config|
         w.vm.provision "file", source: "ops/config/environment.conf", destination: "/tmp/environment.conf"
 
         ## create a token and set it as env var for wc
-        w.vm.provision "shell", privileged: false, path: "ops/scripts/vault_create_token_webserver.sh", args: ["http://#{vault_addr }:8200", "#{vault_token}","#{vault_policy_name}"]
+        # TODO: fix the scirpt iteslef accordign to the changed arguments
+        # w.vm.provision "shell", privileged: false, path: "ops/scripts/vault_create_token_webserver.sh", args: ["#{vault_addr }", "#{vault_policy_name}"]
 
         w.vm.provision "shell", path: "ops/scripts/provision_webserver.sh"
     
