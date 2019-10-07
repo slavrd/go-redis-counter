@@ -19,7 +19,7 @@ before_script:
   - ruby -e 'require "erb"; redis_pass=ENV["REDIS_PASS"]; File.write("ops/config/redis.conf",ERB.new(File.read("ops/config/redis.conf.erb")).result(binding))'
   - sudo cp ops/config/redis.conf /etc/redis/redis.conf && sudo systemctl restart redis-server.service
   - ops/scripts/provision_vault.sh
-  - ops/scripts/vault_setup_basic.sh $VAULT_TOKEN
+  - ops/scripts/vault_setup_basic_dev.sh $VAULT_TOKEN
   - ops/scripts/vault_add_kv_secret.sh kv/redispassword pass $REDIS_PASS
   - mkdir -p artifacts
   - pushd console; go build -o ../artifacts/console; popd
