@@ -5,7 +5,7 @@
 PKGS="curl"
 
 # version of Vault to install
-VAULT_VERSION="1.2.0"
+VAULT_VERSION="1.2.3"
 
 which $PKGS || {
     sudo apt-get update

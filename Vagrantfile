@@ -6,8 +6,7 @@ Vagrant.configure("2") do |config|
     redis_pass = "myRedisPa$$w0rd"
 
     vault_addr = "192.168.2.12"
-    vault_token= "devV@ultRootT0ken"
-    vault_rp_path = "kv/redispassword"
+    vault_rp_path = "kv/redispassword" # must start with the location of the enabled kv secrets engine via ops/scripts/vault_setup_basic.sh.
     vault_rp_key = "pass"
     vault_policy_name="rediscounter" # name for vault policy which restrics access to redis password secret only 
 
@@ -28,14 +27,16 @@ Vagrant.configure("2") do |config|
 
     config.vm.define 'vault' do |vault|
 
-        vault.vm.box = "slavrd/xenial64"
+        vault.vm.box = "slavrd/vault"
         vault.vm.network "private_network", ip: vault_addr
         vault.vm.network "forwarded_port", guest: 8200, host: 8200
 
-        vault.vm.provision "shell", privileged: false, path: "ops/scripts/provision_vault.sh"
-        vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_setup_basic.sh", args: [vault_token]
+        vault.vm.provision "shell", inline: "/etc/vault.d/scripts/vault_init.sh"
+        vault.vm.provision "shell", inline: "/etc/vault.d/scripts/vault_unseal.sh", run: "always"
+        vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_setup_basic.sh"
         vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_add_kv_secret.sh", args: "#{vault_rp_path} #{vault_rp_key} \'#{redis_pass}\'"
         vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_setup_policy.sh", args: ["#{vault_policy_name}", "/vagrant/ops/config/vault-access-policy.hcl"]
+        vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_create_token_local.sh", args: "#{vault_policy_name}"
 
     end
 
@@ -45,10 +46,14 @@ Vagrant.configure("2") do |config|
         c.vm.network "private_network", ip: "192.168.2.21"
         c.vm.synced_folder ".", "/home/vagrant/go/src/github.com/slavrd/go-redis-counter"
 
+        # set up permission for the synced folder
         c.vm.provision "shell", inline: "chown -R vagrant:vagrant /home/vagrant/go"
+
         # set up environment variables for convinience
         c.vm.provision "shell", privileged: false, path: "ops/scripts/provision_client_env.sh", args: "#{redis_addr} '#{redis_pass}' http://#{vault_addr}:8200"
-        c.vm.provision "shell", privileged: false, path: "ops/scripts/vault_create_token.sh", args: ["http://#{vault_addr }:8200", "#{vault_token}","#{vault_policy_name}"]
+
+        # script to setup the Vault token
+        c.vm.provision "shell", privileged: false, path: "ops/scripts/client_set_vault_token.sh"
 
     end
 
@@ -58,15 +63,16 @@ Vagrant.configure("2") do |config|
         w.vm.network "private_network", ip: "192.168.2.31"
         w.vm.network "forwarded_port", guest: 8000, host: 8000
 
-        ## generate webcounter service environment config from template
+        # generate webcounter service environment config from template
         File.write("ops/config/environment.conf", ERB.new(File.read("ops/config/environment.conf.erb")).result(binding))
 
-        ## provision webserver VM, depends on the generated config
+        # provision webserver VM, depends on the generated config
         w.vm.provision "file", source: "ops/config/environment.conf", destination: "/tmp/environment.conf"
 
-        ## create a token and set it as env var for wc
-        w.vm.provision "shell", privileged: false, path: "ops/scripts/vault_create_token_webserver.sh", args: ["http://#{vault_addr }:8200", "#{vault_token}","#{vault_policy_name}"]
+        # run script to set the vault token in /tmp/environment.conf
+        w.vm.provision "shell", privileged: false, path: "ops/scripts/webserver_get_vault_token.sh", env: { "VAULT_IP_ADDR": "#{vault_addr}" }
 
+        # finish provision of the webserver
         w.vm.provision "shell", path: "ops/scripts/provision_webserver.sh"
     
     end
