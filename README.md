@@ -22,9 +22,11 @@ In case you are not familiar with Vagrant, a getting started guide can be found 
 
 The `redis` VM will have redis server running on port `6379` which will be mapped to the host as well. The redis server will have password authentication configured as well.
 
-The `vault` VM will have Vault installed and running in `dev` mode on port `8200` which will be mapped to the host as well.
+The `vault` VM will have Vault installed as a service. There is a script set to unseal vault each time the VM boots. The vault root token is set-up as environment variable for the `vagrant` user.
 
 The `client` VM will have Golang installed so the application can be built and run. The redis server IP and password will be set in the environment variables `$REDIS_ADDR` and `$REDIS_PASS`. The Vault server address and access token will be set as well in `$VAULT_ADDR` and `$VAULT_TOKEN` respectively.
+
+The `webserver` VM has the latest version of the webcounter app installed and running as a service.
 
 Example:
 
@@ -68,11 +70,14 @@ vagrant destroy # destroy the vagrant VMs
 - [X] Box with webcounter running as a service
 - [ ] Update box with webcounter service running as a non privileged user
 - [ ] `webcounter`: add integration with Vault KV secrets engine.
+    - [x] add the integration to the app code
+    - [x] use a vagrant box with vault
+    - [ ] use an AWS AMI with vault in terraform config.
 - [x] `webcounter`: update UI to call the methods with buttons.
 - [x] packer project that creates AWS AMI with `webcounter` app installed as a service
 - [x] terraform project that deploys `webcounter` app and its redis server in AWS
 - [x] add network module to the terraform project
-- [ ] terraform create AWS subents in different AZs
+- [ ] terraform create AWS subnets in different AZs
 - [ ] replace publicly accessible webcounter EC2 instances with load balancer
 - [ ] terraform remove redis password from EC2 instances user data
 
