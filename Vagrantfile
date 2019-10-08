@@ -37,6 +37,7 @@ Vagrant.configure("2") do |config|
         vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_setup_basic.sh"
         vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_add_kv_secret.sh", args: "#{vault_rp_path} #{vault_rp_key} \'#{redis_pass}\'"
         vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_setup_policy.sh", args: ["#{vault_policy_name}", "/vagrant/ops/config/vault-access-policy.hcl"]
+        vault.vm.provision "shell", privileged: false, path: "ops/scripts/vault_create_token_local.sh", args: "#{vault_policy_name}"
 
     end
 
@@ -49,7 +50,9 @@ Vagrant.configure("2") do |config|
         c.vm.provision "shell", inline: "chown -R vagrant:vagrant /home/vagrant/go"
         # set up environment variables for convinience
         c.vm.provision "shell", privileged: false, path: "ops/scripts/provision_client_env.sh", args: "#{redis_addr} '#{redis_pass}' http://#{vault_addr}:8200"
-        c.vm.provision "shell", privileged: false, path: "ops/scripts/vault_create_token.sh", args: ["http://#{vault_addr }:8200", "#{vault_token}","#{vault_policy_name}"]
+
+        # TODO: Create a script to setup the Vault token
+        c.vm.provision "shell", privileged: false, path: "ops/scripts/client_set_vault_token.sh"
 
     end
 
@@ -65,9 +68,8 @@ Vagrant.configure("2") do |config|
         ## provision webserver VM, depends on the generated config
         w.vm.provision "file", source: "ops/config/environment.conf", destination: "/tmp/environment.conf"
 
-        ## create a token and set it as env var for wc
-        # TODO: fix the scirpt iteslef accordign to the changed arguments
-        # w.vm.provision "shell", privileged: false, path: "ops/scripts/vault_create_token_webserver.sh", args: ["#{vault_addr }", "#{vault_policy_name}"]
+        ## TODO: run script to set the vault token in /tmp/environment.conf
+        w.vm.provision "shell", privileged: false, path: "ops/scripts/webserver_get_vault_token.sh", env: { "VAULT_IP_ADDR": "#{vault_addr}" }
 
         w.vm.provision "shell", path: "ops/scripts/provision_webserver.sh"
     
