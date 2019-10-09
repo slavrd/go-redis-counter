@@ -42,7 +42,7 @@ Vagrant.configure("2") do |config|
 
     config.vm.define 'client' do |c|
 
-        c.vm.box = "slavrd/xenial64-golang"
+        c.vm.box = "slavrd/golang"
         c.vm.network "private_network", ip: "192.168.2.21"
         c.vm.synced_folder ".", "/home/vagrant/go/src/github.com/slavrd/go-redis-counter"
 
