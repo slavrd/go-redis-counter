@@ -17,9 +17,9 @@ grep 'VAULT_ADDR=' ${PROFILE} || {
 } 
 
 grep 'VAULT_TOKEN=' ${PROFILE} || {
-    echo "export VAULT_TOKEN=$(cat ${ROOT_TOKEN_PATH})" | tee -a ${PROFILE}
+    echo "export VAULT_TOKEN=$(sudo cat ${ROOT_TOKEN_PATH})" | tee -a ${PROFILE}
 } && {
-    sed -i "s/VAULT_TOKEN=.*/VAULT_TOKEN=$(cat ${ROOT_TOKEN_PATH})/" ${PROFILE}
+    sed -i "s/VAULT_TOKEN=.*/VAULT_TOKEN=$(sudo cat ${ROOT_TOKEN_PATH})/" ${PROFILE}
 }
 
 source ${PROFILE}
